@@ -1,0 +1,14 @@
+{
+    "versiones": [
+        {
+            "numero": "0.1",
+            "fecha": "2021-09-10",
+            "novedades": [
+                {
+                    "titulo": "Lo básico",
+                    "descripcion": "Estructura de directorios y archivos iniciales."
+                }
+            ]
+        }
+    ]
+}

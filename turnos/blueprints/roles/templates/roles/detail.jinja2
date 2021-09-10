@@ -1,0 +1,38 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Rol{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Rol ' + rol.nombre) %}
+        {{ topbar.button_previous('Roles', url_for('roles.list_active')) }}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% if usuarios %}
+        {% call detail.card('Usuarios') %}
+        <table id="usuarios_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Usuarios</th>
+                    <th>e-mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios: %}
+                <tr>
+                    <td><a href="{{ url_for('usuarios.detail', usuario_id=usuario.id) }}">{{ usuario.nombre }}</a></td>
+                    <td>{{ usuario.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endcall %}
+    {% endif %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {{ detail.datatable('usuarios_datatable') }}
+{% endblock %}
