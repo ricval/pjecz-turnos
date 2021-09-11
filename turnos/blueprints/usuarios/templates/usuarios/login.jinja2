@@ -1,0 +1,81 @@
+{% extends 'layouts/login.jinja2' %}
+{% import 'macros/form.jinja2' as f with context %}
+
+{% block title %}Turnos{% endblock %}
+
+{% block welcome %}
+    <div id="welcome" class="text-center">
+        <p><img class="img-fluid" src="{{ url_for('static', filename='images/poder-judicial.png') }}" alt="PJECZ"></p>
+        <h4 class="mb-3">Turnos</h4>
+    </div>
+{% endblock %}
+
+{% block firebase_content %}
+    <div id="firebase_content" class="text-center">
+        <p id="firebase_logged_out" class="text-white">Ingrese con su cuenta de...</p>
+        <p id="firebase_logged_in" class="text-white" style="display:none;"><strong>¡Hola <span id="user">____</span>!</strong></p>
+        <button id="quickstart-sign-in" disabled class="btn btn-primary py-2">Cargando...</button>
+        <p id="quickstart-sign-in-status" class="text-gray"></p>
+    </div>
+{% endblock %}
+
+{% block acceso_form_content %}
+    <div id="acceso_form_content">
+        {% call f.form_tag('usuarios.login', fid='acceso_form') %}
+        <div id="acceso_form_firebase_fields" class="my-2" style="display:none;">
+            <div class="form-floating">
+                {% call f.field(form.email, id='email', class='form-control', readonly='readonly') %}{% endcall %}
+                <label for="email">Correo electrónico</label>
+            </div>
+            <div class="form-floating">
+                {% call f.field(form.token, id='token', class='form-control', readonly='readonly') %}{% endcall %}
+                <label for="token">Token</label>
+            </div>
+            <button id="acceso_form_firebase_submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
+        </div>
+        <div id="acceso_form_password_fields" class="my-2" style="display:none;">
+            <div class="form-floating">
+                {% call f.field(form.identidad, id='identidad', class='form-control', autofocus='autofocus') %}{% endcall %}
+                <label for="identidad">Correo electrónico</label>
+            </div>
+            <div class="form-floating">
+                {% call f.field(form.contrasena, id='contrasena', class='form-control') %}{% endcall %}
+                <label for="contrasena">Contraseña</label>
+            </div>
+            <button id="acceso_form_password_submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
+        </div>
+        {% endcall %}
+    </div>
+{% endblock %}
+
+{% block custom_javascript %}
+    <!-- The core Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script>
+        /* Firebase configuracion */
+        var firebaseConfig = {
+            apiKey: "{{ firebase_auth['apiKey'] }}",
+            authDomain: "{{ firebase_auth['authDomain'] }}",
+            databaseURL: "{{ firebase_auth['databaseURL'] }}",
+            projectId: "{{ firebase_auth['projectId'] }}",
+            storageBucket: "{{ firebase_auth['storageBucket'] }}",
+            messagingSenderId: "{{ firebase_auth['messagingSenderId'] }}",
+            appId: "{{ firebase_auth['appId'] }}",
+            measurementId: "{{ firebase_auth['measurementId'] }}"
+        };
+        /* Al inicio */
+        $(document).ready(function() {
+            if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
+                firebase.initializeApp(firebaseConfig); // Inicializar Firebase
+                initApp(); // Cargar eventos de la interfaz
+                $('#acceso_form_password_fields').hide();
+            } else {
+                $('#firebase_content').hide(); // Ocultar autentificación por cuenta
+                $('#acceso_form_password_fields').show(); // Mostrar ingreso por e-mail y contraseña
+            }
+        });
+    </script>
+{% endblock %}
