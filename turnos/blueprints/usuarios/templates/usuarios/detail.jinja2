@@ -1,0 +1,34 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Usuario{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Usuario') %}
+        {{ topbar.button_previous('Usuarios', url_for('usuarios.list_active')) }}
+        {% if current_user.can_edit('usuarios') %}
+            {{ topbar.button_edit('Editar', url_for('usuarios.edit', usuario_id=usuario.id)) }}
+            {% if usuario.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('usuarios.delete', usuario_id=usuario.id)) }}{% endif %}
+            {% if usuario.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('usuarios.recover', usuario_id=usuario.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call detail.card(estatus=usuario.estatus) %}
+        {{ detail.label_value_big('Nombre', usuario.nombre) }}
+        {{ detail.label_value('e-mail', usuario.email) }}
+        {{ detail.label_value('Rol', usuario.rol.nombre) }}
+        {{ detail.label_value('Creado', moment(usuario.creado).format('llll')) }}
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_edit('usuarios') %}
+        {% if usuario.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + usuario.nombre + '?') }}{% endif %}
+        {% if usuario.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + usuario.nombre + '?') }}{% endif %}
+    {% endif %}
+    {{ detail.moment_js(moment) }}
+{% endblock %}

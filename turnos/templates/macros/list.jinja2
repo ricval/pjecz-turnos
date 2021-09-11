@@ -1,0 +1,75 @@
+{# Card #}
+{%- macro card() -%}
+    <div class="card">
+        <div class="card-body">
+            {{ caller () }}
+        </div>
+    </div>
+{%- endmacro -%}
+
+{# JavaScript Datatable #}
+{%- macro datatable(table_id, order="asc") -%}
+    <!-- Datatable -->
+    <script>
+        $('#{{ table_id }}').DataTable({
+            {% if order == "asc" %}order: [[ 0, "asc" ]],{% endif %}
+            {% if order == "desc" %}order: [[ 0, "desc" ]],{% endif %}
+            language: {
+                lengthMenu: "Mostrar _MENU_",
+                search: "Filtrar:",
+                zeroRecords: "No se encontraron registros",
+                info: "Total de registros _TOTAL_ ",
+                infoEmpty: "No hay registros",
+                infoFiltered: "(_TOTAL_ filtrados de _MAX_ registros)",
+                oPaginate: {
+                    sFirst: "Primero",
+                    sLast: "Último",
+                    sNext: "Siguiente",
+                    sPrevious: "Anterior"
+                }
+            },
+            responsive: true
+        });
+    </script>
+{%- endmacro -%}
+
+{# JavaScript Datatable times in first column from UTC to local #}
+{%- macro datatable_times(table_id, order="desc") -%}
+    <!-- Datatable with datetime in first column -->
+    <script>
+        $('#{{ table_id }}').DataTable({
+            {% if order == "asc" %}order: [[ 0, "asc" ]],{% endif %}
+            {% if order == "desc" %}order: [[ 0, "desc" ]],{% endif %}
+            columnDefs: [ {
+                targets: 0,
+                type: "date",
+                render: function (data, type, row) {
+                    return moment.utc(data).local().format("YYYY-MM-DD HH:mm:ss");
+                }
+            } ],
+            scrollX: true,
+            bSortable: false,
+            language: {
+                lengthMenu: "Mostrar _MENU_",
+                search: "Filtrar:",
+                zeroRecords: "No se encontraron registros",
+                info: "Total de registros _TOTAL_ ",
+                infoEmpty: "No hay registros",
+                infoFiltered: "(_TOTAL_ filtrados de _MAX_ registros)",
+                oPaginate: {
+                    sFirst: "Primero",
+                    sLast: "Último",
+                    sNext: "Siguiente",
+                    sPrevious: "Anterior"
+                }
+            },
+            responsive: true
+        });
+    </script>
+{%- endmacro -%}
+{#  #}
+
+{# Material Design Icons #}
+{%- macro icon_open_in_new() -%}
+    <span class='iconify' data-icon='mdi:open-in-new'></span>
+{%- endmacro -%}
