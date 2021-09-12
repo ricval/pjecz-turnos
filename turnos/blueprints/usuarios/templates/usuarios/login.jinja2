@@ -1,28 +1,26 @@
 {% extends 'layouts/login.jinja2' %}
 {% import 'macros/form.jinja2' as f with context %}
 
-{% block title %}Turnos{% endblock %}
+{% block title %}{{ title }}{% endblock %}
 
 {% block welcome %}
     <div id="welcome" class="text-center">
         <p><img class="img-fluid" src="{{ url_for('static', filename='images/poder-judicial.png') }}" alt="PJECZ"></p>
-        <h4 class="mb-3">Turnos</h4>
+        <h4 class="mb-3">{{ title }}</h4>
     </div>
 {% endblock %}
 
-{% block firebase_content %}
-    <div id="firebase_content" class="text-center">
-        <p id="firebase_logged_out" class="text-white">Ingrese con su cuenta de...</p>
-        <p id="firebase_logged_in" class="text-white" style="display:none;"><strong>¡Hola <span id="user">____</span>!</strong></p>
-        <button id="quickstart-sign-in" disabled class="btn btn-primary py-2">Cargando...</button>
-        <p id="quickstart-sign-in-status" class="text-gray"></p>
+{% block content %}
+    <div id="firebase" class="text-center">
+        <p id="firebase-logged-out" class="text-white">Ingrese con su cuenta...</p>
+        <p id="firebase-logged-in" class="text-white" style="display:none;"><strong>¡Hola <span id="user"></span>!</strong></p>
+        <button id="firebase-sign-in-button" disabled class="btn btn-primary py-2">Cargando...</button>
+        <p id="firebase-sign-in-status" class="text-gray"></p>
+        <!--pre><code id="firebase-account-details">null</code></pre-->
     </div>
-{% endblock %}
-
-{% block acceso_form_content %}
-    <div id="acceso_form_content">
-        {% call f.form_tag('usuarios.login', fid='acceso_form') %}
-        <div id="acceso_form_firebase_fields" class="my-2" style="display:none;">
+    <div id="access">
+        {% call f.form_tag('usuarios.login', fid='access_form') %}
+        <div id="access-form-firebase" class="my-2" style="display:none;">
             <div class="form-floating">
                 {% call f.field(form.email, id='email', class='form-control', readonly='readonly') %}{% endcall %}
                 <label for="email">Correo electrónico</label>
@@ -31,9 +29,9 @@
                 {% call f.field(form.token, id='token', class='form-control', readonly='readonly') %}{% endcall %}
                 <label for="token">Token</label>
             </div>
-            <button id="acceso_form_firebase_submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
+            <button id="access-form-firebase-submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
         </div>
-        <div id="acceso_form_password_fields" class="my-2" style="display:none;">
+        <div id="access-form-password" class="my-2" style="display:none;">
             <div class="form-floating">
                 {% call f.field(form.identidad, id='identidad', class='form-control', autofocus='autofocus') %}{% endcall %}
                 <label for="identidad">Correo electrónico</label>
@@ -42,7 +40,7 @@
                 {% call f.field(form.contrasena, id='contrasena', class='form-control') %}{% endcall %}
                 <label for="contrasena">Contraseña</label>
             </div>
-            <button id="acceso_form_password_submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
+            <button id="access-form-password-submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
         </div>
         {% endcall %}
     </div>
@@ -50,12 +48,11 @@
 
 {% block custom_javascript %}
     <!-- The core Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.2.3/firebase-auth.js"></script>
-    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script>
-        /* Firebase configuracion */
+        /* Firebase configuration */
         var firebaseConfig = {
             apiKey: "{{ firebase_auth['apiKey'] }}",
             authDomain: "{{ firebase_auth['authDomain'] }}",
@@ -66,16 +63,89 @@
             appId: "{{ firebase_auth['appId'] }}",
             measurementId: "{{ firebase_auth['measurementId'] }}"
         };
-        /* Al inicio */
-        $(document).ready(function() {
-            if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
-                firebase.initializeApp(firebaseConfig); // Inicializar Firebase
-                initApp(); // Cargar eventos de la interfaz
-                $('#acceso_form_password_fields').hide();
+        /* Firebase function called when clicking the Login/Logout button */
+        function toggleSignIn() {
+            if (!firebase.auth().currentUser) {
+                var provider = new firebase.auth.GoogleAuthProvider();
+                provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
+                //var provider = new firebase.auth.GithubAuthProvider();
+                //provider.addScope('repo');
+                firebase.auth().signInWithPopup(provider).then(function(result) {
+                    // This gives you a Google Access Token
+                    var token = result.credential.accessToken;
+                    // The signed-in user info
+                    var user = result.user;
+                    //document.getElementById('quickstart-oauthtoken').textContent = token;
+                }).catch(function(error) {
+                    // Handle Errors here
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+                    // The email of the user's account used
+                    var email = error.email;
+                    // The firebase.auth.AuthCredential type that was used
+                    var credential = error.credential;
+                    if (errorCode === 'auth/account-exists-with-different-credential') {
+                        alert('You have already signed up with a different auth provider for that email.');
+                        // If you are using multiple auth providers on your app you should handle linking
+                        // the user's accounts here
+                    } else {
+                        console.error(error);
+                    }
+                });
             } else {
-                $('#firebase_content').hide(); // Ocultar autentificación por cuenta
-                $('#acceso_form_password_fields').show(); // Mostrar ingreso por e-mail y contraseña
+                firebase.auth().signOut();
             }
-        });
+            document.getElementById('firebase-sign-in-button').disabled = true;
+        }
+        /* Firebase initApp */
+        function initApp() {
+            // Listening for auth state changes
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is signed in
+                    var displayName = user.displayName;
+                    var email = user.email;
+                    var emailVerified = user.emailVerified;
+                    var photoURL = user.photoURL;
+                    var isAnonymous = user.isAnonymous;
+                    var uid = user.uid;
+                    var providerData = user.providerData;
+                    document.getElementById('firebase-sign-in-status').textContent = 'Abierta';
+                    document.getElementById('firebase-sign-in-button').textContent = 'Cerrar esta cuenta';
+                    //document.getElementById('firebase-account-details').textContent = JSON.stringify(user, null, '  ');
+                    var welcomeUser = displayName ? displayName : email;
+                    document.getElementById('user').textContent = welcomeUser;
+                    user.getIdToken().then(function (idToken) {
+                        document.getElementById('email').setAttribute('value', user.email);
+                        document.getElementById('token').setAttribute('value', idToken);
+                    });
+                    document.getElementById('firebase-logged-out').style.display = 'none';
+                    document.getElementById('firebase-logged-in').style.display = 'inline';
+                    document.getElementById('access-form-firebase').style.display = 'inline';
+                } else {
+                    // User is signed out
+                    document.getElementById('firebase-sign-in-status').textContent = 'Cerrada';
+                    document.getElementById('firebase-sign-in-button').textContent = 'Abrir con Google';
+                    //document.getElementById('firebase-account-details').textContent = 'null';
+                    //document.getElementById('quickstart-oauthtoken').textContent = 'null';
+                    document.getElementById('firebase-logged-out').style.display = 'inline';
+                    document.getElementById('firebase-logged-in').style.display = 'none';
+                    document.getElementById('access-form-firebase').style.display = 'none';
+                }
+                document.getElementById('firebase-sign-in-button').disabled = false;
+            });
+            document.getElementById('firebase-sign-in-button').addEventListener('click', toggleSignIn, false);
+        }
+        /* At start */
+        window.onload = function() {
+            //if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
+            firebase.initializeApp(firebaseConfig);
+            initApp();
+            //document.getElementById('access-form-password').style.display = 'none';
+            //} else {
+            //    document.getElementById('firebase').style.display = 'none';
+            //    document.getElementById('access-form-password').style.display = 'inline';
+            //}
+        };
     </script>
 {% endblock %}
