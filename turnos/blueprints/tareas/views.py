@@ -11,6 +11,8 @@ from turnos.blueprints.tareas.models import Tarea
 
 tareas = Blueprint("tareas", __name__, template_folder="templates")
 
+MODULO = "TAREAS"
+
 
 @tareas.before_request
 @login_required

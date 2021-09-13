@@ -1,18 +1,19 @@
 // Firebase authentification GitHub
 
-// Función que es llamada cuando se da clic al botón firebase-sign-in-google
+// Función que es llamada cuando se da clic al botón firebase-sign-in-github
 function githubToggleSignIn() {
     if (!firebase.auth().currentUser) {
-        // GitHub provider
+        // GitHub Auth provider
         var githubProvider = new firebase.auth.GithubAuthProvider();
         githubProvider.addScope('repo');
         // Sign-in with pop-up
         firebase.auth().signInWithPopup(githubProvider).then(function (result) {
             // This gives you a GitHub Token
-            var token = result.credential.accessToken;
+            //var token = result.credential.accessToken;
             // The signed-in user info
-            var user = result.user;
-            //document.getElementById('quickstart-oauthtoken').textContent = token;
+            //var user = result.user;
+            document.getElementById('firebase-sign-in-github-status').textContent = 'Autenticado con GitHub';
+            console.log(result);
         }).catch(function (error) {
             // Handle Errors here
             var errorCode = error.code;

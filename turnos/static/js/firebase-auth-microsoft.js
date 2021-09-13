@@ -1,20 +1,21 @@
 // Firebase authentification Microsoft
 
-// Función que es llamada cuando se da clic al botón firebase-sign-in-google
+// Función que es llamada cuando se da clic al botón firebase-sign-in-microsoft
 function microsoftToggleSignIn() {
     if (!firebase.auth().currentUser) {
-        // Microsoft provider
+        // Microsoft Auth provider
         var microsoftProvider = new firebase.auth.OAuthProvider('microsoft.com');
         microsoftProvider.addScope('User.Read');
         // Sign-in with pop-up
         firebase.auth().signInWithPopup(microsoftProvider).then(function (result) {
             // This gives you a Microsoft Token
-            var token = result.credential.accessToken;
+            //var token = result.credential.accessToken;
             // You can also retrieve the OAuth ID token
-            var idToken = result.credential.idToken;
+            //var idToken = result.credential.idToken;
             // The signed-in user info
-            var user = result.user;
-            //document.getElementById('quickstart-oauthtoken').textContent = token;
+            //var user = result.user;
+            document.getElementById('firebase-sign-in-microsoft-status').textContent = 'Autenticado con Microsoft';
+            console.log(result);
         }).catch(function (error) {
             // Handle Errors here
             var errorCode = error.code;

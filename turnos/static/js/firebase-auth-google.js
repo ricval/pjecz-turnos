@@ -3,16 +3,17 @@
 // Función que es llamada cuando se da clic al botón firebase-sign-in-google
 function googleToggleSignIn() {
     if (!firebase.auth().currentUser) {
-        // Google provider
+        // Google Auth provider
         var googleProvider = new firebase.auth.GoogleAuthProvider();
         googleProvider.addScope('https://www.googleapis.com/auth/contacts.readonly');
         // Sign-in with pop-up
         firebase.auth().signInWithPopup(googleProvider).then(function (result) {
             // This gives you a Google Access Token
-            var token = result.credential.accessToken;
+            //var token = result.credential.accessToken;
             // The signed-in user info
-            var user = result.user;
-            //document.getElementById('quickstart-oauthtoken').textContent = token;
+            //var user = result.user;
+            document.getElementById('firebase-sign-in-google-status').textContent = 'Autenticado con Google';
+            console.log(result);
         }).catch(function (error) {
             // Handle Errors here
             var errorCode = error.code;
