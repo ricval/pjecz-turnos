@@ -11,14 +11,21 @@
 {% endblock %}
 
 {% block content %}
-    <div id="firebase" class="text-center">
-        <p id="firebase-logged-out" class="text-white">Ingrese con su cuenta...</p>
-        <p id="firebase-logged-in" class="text-white" style="display:none;"><strong>¡Hola <span id="user"></span>!</strong></p>
-        <button id="firebase-sign-in-button" disabled class="btn btn-primary py-2">Cargando...</button>
-        <p id="firebase-sign-in-status" class="text-gray"></p>
-        <!--pre><code id="firebase-account-details">null</code></pre-->
+    <div id="firebase" class="py-2">
+        <div class="text-center my-2">
+            <p id="firebase-logged-out" class="text-white">Ingrese con:</p>
+            <p id="firebase-logged-in" class="text-white" style="display:none;"><strong>¡Hola <span id="user"></span>!</strong></p>
+        </div>
+        <div class="d-grid gap-2 my-2">
+            <button id="firebase-sign-in-google" disabled class="btn btn-primary">Cargando...</button>
+            <button id="firebase-sign-in-microsoft" disabled class="btn btn-primary">Cargando...</button>
+            <button id="firebase-sign-in-github" disabled class="btn btn-primary">Cargando...</button>
+        </div>
     </div>
-    <div id="access">
+    <div id="access" class="py-2">
+        <span id="firebase-sign-in-google-status" class="text-secondary"></span>
+        <span id="firebase-sign-in-github-status" class="text-secondary"></span>
+        <span id="firebase-sign-in-microsoft-status" class="text-secondary"></span>
         {% call f.form_tag('usuarios.login', fid='access_form') %}
         <div id="access-form-firebase" class="my-2" style="display:none;">
             <div class="form-floating">
@@ -44,6 +51,11 @@
         </div>
         {% endcall %}
     </div>
+    <div class="card py-2">
+        <div class="card-body">
+            <pre class="text-secondary"><code id="firebase-account-details"></code></pre>
+        </div>
+    </div>
 {% endblock %}
 
 {% block custom_javascript %}
@@ -51,9 +63,13 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="{{ url_for('static', filename='js/firebase-auth-github.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/firebase-auth-google.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/firebase-auth-microsoft.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/firebase-auth.js') }}"></script>
     <script>
         /* Firebase configuration */
-        var firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "{{ firebase_auth['apiKey'] }}",
             authDomain: "{{ firebase_auth['authDomain'] }}",
             databaseURL: "{{ firebase_auth['databaseURL'] }}",
@@ -63,85 +79,11 @@
             appId: "{{ firebase_auth['appId'] }}",
             measurementId: "{{ firebase_auth['measurementId'] }}"
         };
-        /* Firebase function called when clicking the Login/Logout button */
-        function toggleSignIn() {
-            if (!firebase.auth().currentUser) {
-                var provider = new firebase.auth.GoogleAuthProvider();
-                provider.addScope('https://www.googleapis.com/auth/contacts.readonly');
-                //var provider = new firebase.auth.GithubAuthProvider();
-                //provider.addScope('repo');
-                firebase.auth().signInWithPopup(provider).then(function(result) {
-                    // This gives you a Google Access Token
-                    var token = result.credential.accessToken;
-                    // The signed-in user info
-                    var user = result.user;
-                    //document.getElementById('quickstart-oauthtoken').textContent = token;
-                }).catch(function(error) {
-                    // Handle Errors here
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-                    // The email of the user's account used
-                    var email = error.email;
-                    // The firebase.auth.AuthCredential type that was used
-                    var credential = error.credential;
-                    if (errorCode === 'auth/account-exists-with-different-credential') {
-                        alert('You have already signed up with a different auth provider for that email.');
-                        // If you are using multiple auth providers on your app you should handle linking
-                        // the user's accounts here
-                    } else {
-                        console.error(error);
-                    }
-                });
-            } else {
-                firebase.auth().signOut();
-            }
-            document.getElementById('firebase-sign-in-button').disabled = true;
-        }
-        /* Firebase initApp */
-        function initApp() {
-            // Listening for auth state changes
-            firebase.auth().onAuthStateChanged(function(user) {
-                if (user) {
-                    // User is signed in
-                    var displayName = user.displayName;
-                    var email = user.email;
-                    var emailVerified = user.emailVerified;
-                    var photoURL = user.photoURL;
-                    var isAnonymous = user.isAnonymous;
-                    var uid = user.uid;
-                    var providerData = user.providerData;
-                    document.getElementById('firebase-sign-in-status').textContent = 'Abierta';
-                    document.getElementById('firebase-sign-in-button').textContent = 'Cerrar esta cuenta';
-                    //document.getElementById('firebase-account-details').textContent = JSON.stringify(user, null, '  ');
-                    var welcomeUser = displayName ? displayName : email;
-                    document.getElementById('user').textContent = welcomeUser;
-                    user.getIdToken().then(function (idToken) {
-                        document.getElementById('email').setAttribute('value', user.email);
-                        document.getElementById('token').setAttribute('value', idToken);
-                    });
-                    document.getElementById('firebase-logged-out').style.display = 'none';
-                    document.getElementById('firebase-logged-in').style.display = 'inline';
-                    document.getElementById('access-form-firebase').style.display = 'inline';
-                } else {
-                    // User is signed out
-                    document.getElementById('firebase-sign-in-status').textContent = 'Cerrada';
-                    document.getElementById('firebase-sign-in-button').textContent = 'Abrir con Google';
-                    //document.getElementById('firebase-account-details').textContent = 'null';
-                    //document.getElementById('quickstart-oauthtoken').textContent = 'null';
-                    document.getElementById('firebase-logged-out').style.display = 'inline';
-                    document.getElementById('firebase-logged-in').style.display = 'none';
-                    document.getElementById('access-form-firebase').style.display = 'none';
-                }
-                document.getElementById('firebase-sign-in-button').disabled = false;
-            });
-            document.getElementById('firebase-sign-in-button').addEventListener('click', toggleSignIn, false);
-        }
         /* At start */
         window.onload = function() {
-            //if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
             firebase.initializeApp(firebaseConfig);
             initApp();
-            //document.getElementById('access-form-password').style.display = 'none';
+            //if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
             //} else {
             //    document.getElementById('firebase').style.display = 'none';
             //    document.getElementById('access-form-password').style.display = 'inline';
