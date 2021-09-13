@@ -36,12 +36,18 @@ function initApp() {
                     githubButton.disabled = false;
                     githubButton.style.display = 'inline';
                 }
+                if (data['providerId'] == 'microsoft.com') {
+                    microsoftButton.textContent = 'Cerrar cuenta de Microsoft';
+                    microsoftButton.disabled = false;
+                    microsoftButton.style.display = 'inline';
+                }
             });
-            //document.getElementById('firebase-account-details').style.display = 'inline';
-            //document.getElementById('firebase-account-details').textContent = JSON.stringify(user, null, '  ');
             // Welcome
             var welcomeUser = displayName ? displayName : email;
             document.getElementById('user').textContent = welcomeUser;
+            // Account details
+            document.getElementById('account').style.display = 'inline';
+            document.getElementById('account-details').textContent = JSON.stringify(user, null, '  ');
             // Fill form
             user.getIdToken().then(function (idToken) {
                 document.getElementById('email').setAttribute('value', user.email);
@@ -64,11 +70,10 @@ function initApp() {
             document.getElementById('firebase-sign-in-google-status').textContent = '';
             document.getElementById('firebase-sign-in-github-status').textContent = '';
             document.getElementById('firebase-sign-in-microsoft-status').textContent = '';
-            //document.getElementById('firebase-account-details').textContent = 'null';
-            //document.getElementById('firebase-account-details').style.display = 'none';
             document.getElementById('firebase-logged-out').style.display = 'inline';
             document.getElementById('firebase-logged-in').style.display = 'none';
             document.getElementById('access-form-firebase').style.display = 'none';
+            document.getElementById('account-details').textContent = 'null';
         }
     });
     // Add listeners in buttons

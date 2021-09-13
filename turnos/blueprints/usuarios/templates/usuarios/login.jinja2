@@ -52,10 +52,12 @@
             <button id="access-form-password-submit" class="w-100 btn btn-lg btn-primary my-2" type="submit">Ingresar</button>
         </div>
         {% endcall %}
-    </div>
-    <div class="card py-2" style="display:none;">
-        <div class="card-body">
-            <pre class="text-secondary"><code id="firebase-account-details"></code></pre>
+        <div id="account" class="my-2" style="display:none;">
+            <div class="card">
+                <div class="card-body">
+                    <pre class="text-secondary"><code id="account-details"></code></pre>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -82,13 +84,14 @@
         };
         /* At start */
         window.onload = function() {
-            firebase.initializeApp(firebaseConfig);
-            initApp();
             //if (window.location.protocol == "https:" && firebaseConfig['apiKey'] != "") {
-            //} else {
-            //    document.getElementById('firebase').style.display = 'none';
-            //    document.getElementById('access-form-password').style.display = 'inline';
-            //}
+            if (firebaseConfig['apiKey'] != "") {
+                firebase.initializeApp(firebaseConfig);
+                initApp();
+            } else {
+                document.getElementById('firebase').style.display = 'none';
+                document.getElementById('access-form-password').style.display = 'inline';
+            }
         };
     </script>
 {% endblock %}
