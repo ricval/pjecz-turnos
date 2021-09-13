@@ -11,6 +11,8 @@ from turnos.blueprints.usuarios.models import Usuario
 
 roles = Blueprint('roles', __name__, template_folder='templates')
 
+MODULO = "ROLES"
+
 
 @roles.route('/roles')
 @login_required

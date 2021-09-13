@@ -79,7 +79,7 @@ def login():
                 flash("Usuario o contraseña incorrectos.", "warning")
         else:
             flash("Infomación incompleta.", "warning")
-    return render_template("usuarios/login.jinja2", form=form, firebase_auth=firebase_auth)
+    return render_template("usuarios/login.jinja2", form=form, firebase_auth=firebase_auth, title="Turnos")
 
 
 @usuarios.route("/logout")
