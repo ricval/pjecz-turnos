@@ -25,4 +25,4 @@ class Permiso(db.Model, UniversalMixin):
 
     def __repr__(self):
         """Representación"""
-        return f"<Permiso {nombre}>"
+        return f"<Permiso {self.nombre}>"

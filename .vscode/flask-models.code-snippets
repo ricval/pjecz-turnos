@@ -32,7 +32,7 @@
 			"",
 			"\tdef __repr__(self):",
 			"\t\t\"\"\" Representación \"\"\"",
-			"\t\treturn f'<${3:Clase}>'",
+			"\t\treturn '<${3:Clase}>'",
 			""
 		],
 		"description": "Contenido inicial para modelos"

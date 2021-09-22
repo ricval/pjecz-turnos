@@ -18,10 +18,6 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     # Clave primaria
     id = db.Column(db.Integer(), primary_key=True)
 
-    # Claves foráneas
-    rol_id = db.Column(db.Integer, db.ForeignKey("roles.id"), index=True, nullable=False)
-    rol = db.relationship("Rol", back_populates="usuarios")
-
     # Columnas
     email = db.Column(db.String(256), unique=True, index=True)
     contrasena = db.Column(db.String(256), nullable=False)
@@ -33,6 +29,7 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     bitacoras = db.relationship("Bitacora", back_populates="usuario", lazy="noload")
     entradas_salidas = db.relationship("EntradaSalida", back_populates="usuario", lazy="noload")
     tareas = db.relationship("Tarea", back_populates="usuario", lazy="noload")
+    usuarios_roles = db.relationship("UsuarioRol", back_populates="usuario")
 
     @property
     def nombre(self):

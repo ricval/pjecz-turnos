@@ -19,4 +19,4 @@ class Modulo(db.Model, UniversalMixin):
 
     def __repr__(self):
         """Representación"""
-        return f"<Modulo {nombre}>"
+        return f"<Modulo {self.nombre}>"
