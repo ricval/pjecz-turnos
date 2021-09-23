@@ -22,6 +22,7 @@ class Permiso(db.Model, UniversalMixin):
 
     # Columnas
     nombre = db.Column(db.String(256), unique=True, nullable=False)
+    nivel = db.Column(db.Integer(), nullable=False)
 
     def __repr__(self):
         """Representación"""

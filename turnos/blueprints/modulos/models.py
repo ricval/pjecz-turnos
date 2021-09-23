@@ -17,6 +17,9 @@ class Modulo(db.Model, UniversalMixin):
     # Columnas
     nombre = db.Column(db.String(256), unique=True, nullable=False)
 
+    # Hijos
+    permisos = db.relationship('Permiso', back_populates='modulo')
+
     def __repr__(self):
         """Representación"""
         return f"<Modulo {self.nombre}>"

@@ -38,6 +38,7 @@ class Rol(db.Model, UniversalMixin):
     por_defecto = db.Column(db.Boolean, default=False, index=True)
 
     # Hijos
+    permisos = db.relationship('Permiso', back_populates='rol')
     usuarios_roles = db.relationship("UsuarioRol", back_populates="rol")
 
     def add_permission(self, perm):
