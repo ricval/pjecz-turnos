@@ -18,6 +18,10 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     # Clave primaria
     id = db.Column(db.Integer(), primary_key=True)
 
+    # Clave foránea
+    autoridad_id = db.Column(db.Integer, db.ForeignKey("autoridades.id"), index=True, nullable=False)
+    autoridad = db.relationship("Autoridad", back_populates="usuarios")
+
     # Columnas
     email = db.Column(db.String(256), unique=True, index=True)
     contrasena = db.Column(db.String(256), nullable=False)
@@ -56,23 +60,23 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
 
     def can(self, perm):
         """¿Tiene permiso?"""
-        return self.rol.has_permission(perm)
+        return True  # self.rol.has_permission(perm)
 
     def can_view(self, module):
         """¿Tiene permiso para ver?"""
-        return self.rol.can_view(module)
+        return True  # self.rol.can_view(module)
 
     def can_insert(self, module):
         """¿Tiene permiso para agregar?"""
-        return self.rol.can_insert(module)
+        return True  # self.rol.can_insert(module)
 
     def can_edit(self, module):
         """¿Tiene permiso para editar?"""
-        return self.rol.can_edit(module)
+        return True  # self.rol.can_edit(module)
 
     def can_admin(self, module):
         """¿Tiene permiso para administrar?"""
-        return self.rol.can_admin(module)
+        return True  # self.rol.can_admin(module)
 
     def launch_task(self, nombre, descripcion, *args, **kwargs):
         """Arrancar tarea"""
