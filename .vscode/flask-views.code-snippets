@@ -20,7 +20,7 @@
 			"",
 			"@${3:blueprint}.before_request",
 			"@login_required",
-			"@permission_required(Permiso.${4:VER})",
+			"@permission_required(Permiso.VER_)",
 			"def before_request():",
 			"\t\"\"\" Permiso por defecto \"\"\"",
 			"",

@@ -19,6 +19,7 @@ pylint
 pylint-flask-sqlalchemy
 PyMySQL
 pylint
+python-dotenv
 pytz
 rq
 sendgrid

@@ -24,6 +24,8 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     nombres = db.Column(db.String(256), nullable=False)
     apellido_paterno = db.Column(db.String(256), nullable=False)
     apellido_materno = db.Column(db.String(256))
+    curp = db.Column(db.String(256), unique=True)
+    puesto = db.Column(db.String(256))
 
     # Hijos
     bitacoras = db.relationship("Bitacora", back_populates="usuario", lazy="noload")

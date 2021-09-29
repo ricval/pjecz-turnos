@@ -7,7 +7,9 @@ import rq
 
 from turnos.extensions import csrf, db, login_manager, moment
 
+from turnos.blueprints.autoridades.views import autoridades
 from turnos.blueprints.bitacoras.views import bitacoras
+from turnos.blueprints.distritos.views import distritos
 from turnos.blueprints.entradas_salidas.views import entradas_salidas
 from turnos.blueprints.roles.views import roles
 from turnos.blueprints.sistemas.views import sistemas
@@ -29,7 +31,9 @@ def create_app():
     app.redis = Redis.from_url(app.config["REDIS_URL"])
     app.task_queue = rq.Queue(app.config["TASK_QUEUE"], connection=app.redis, default_timeout=1920)
     # Cargar los blueprints
+    app.register_blueprint(autoridades)
     app.register_blueprint(bitacoras)
+    app.register_blueprint(distritos)
     app.register_blueprint(entradas_salidas)
     app.register_blueprint(roles)
     app.register_blueprint(sistemas)
