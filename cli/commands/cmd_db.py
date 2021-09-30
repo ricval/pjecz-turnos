@@ -17,6 +17,7 @@ from cli.commands.alimentar_modulos import alimentar_modulos
 from cli.commands.alimentar_permisos import alimentar_permisos
 from cli.commands.alimentar_roles import alimentar_roles
 from cli.commands.alimentar_usuarios import alimentar_usuarios
+from cli.commands.alimentar_usuarios_roles import alimentar_usuarios_roles
 
 app = create_app()
 db.app = app
@@ -52,6 +53,7 @@ def alimentar():
     alimentar_distritos()
     alimentar_autoridades()
     alimentar_usuarios()
+    alimentar_usuarios_roles()
     click.echo("Alimentado.")
 
 

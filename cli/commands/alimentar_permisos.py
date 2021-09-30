@@ -33,7 +33,7 @@ def alimentar_permisos():
             rol_id = int(row["rol_id"])
             rol = Rol.query.get(rol_id)
             if rol is None:
-                click.echo(f"AVISO: Falta el rol_id {str(rol_id)}")
+                click.echo(f"  Falta el rol_id {str(rol_id)}")
                 return
             for modulo in modulos:
                 columna = modulo.nombre.lower()
@@ -44,15 +44,16 @@ def alimentar_permisos():
                     nivel = int(row[columna])
                     if nivel < 0 or nivel > 3:
                         raise ValueError
-                    if nivel == 0:
-                        continue
-                    Permiso(
-                        rol=rol,
-                        modulo=modulo,
-                        nombre=f"Para {rol.nombre} en {modulo.nombre}",
-                        nivel=nivel,
-                    ).save()
-                    contador += 1
                 except ValueError:
-                    click.echo("  Se omite un permiso por estar mal")
+                    click.echo("  Se omite un permiso por no ser un número entre 0 y 3")
+                    continue
+                if nivel == 0:
+                    continue
+                Permiso(
+                    rol=rol,
+                    modulo=modulo,
+                    nombre=f"Para {rol.nombre} en {modulo.nombre}",
+                    nivel=nivel,
+                ).save()
+                contador += 1
     click.echo(f"  {contador} permisos alimentados.")
