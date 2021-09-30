@@ -6,6 +6,8 @@ from flask_login import UserMixin
 
 from lib.universal_mixin import UniversalMixin
 from turnos.extensions import db, pwd_context
+from turnos.blueprints.modulos.models import Modulo
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.tareas.models import Tarea
 
 
@@ -58,25 +60,33 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
             return pwd_context.verify(password, self.contrasena)
         return True
 
-    def can(self, perm):
+    def can(self, module, permission):
         """¿Tiene permiso?"""
-        return True  # self.rol.has_permission(perm)
+        modulo = Modulo.query.filter_by(nombre=module).first()
+        if modulo is None:
+            return False
+        maximo = 0
+        for usuario_rol in self.usuarios_roles:
+            for permiso in usuario_rol.rol.permisos:
+                if permiso.modulo == modulo and permiso.nivel > maximo:
+                    maximo = permiso.nivel
+        return maximo >= permission
 
     def can_view(self, module):
         """¿Tiene permiso para ver?"""
-        return True  # self.rol.can_view(module)
-
-    def can_insert(self, module):
-        """¿Tiene permiso para agregar?"""
-        return True  # self.rol.can_insert(module)
+        return self.can(module, Permiso.VER)
 
     def can_edit(self, module):
         """¿Tiene permiso para editar?"""
-        return True  # self.rol.can_edit(module)
+        return self.can(module, Permiso.MODIFICAR)
+
+    def can_insert(self, module):
+        """¿Tiene permiso para agregar?"""
+        return self.can(module, Permiso.CREAR)
 
     def can_admin(self, module):
         """¿Tiene permiso para administrar?"""
-        return True  # self.rol.can_admin(module)
+        return self.can(module, Permiso.ADMINISTRAR)
 
     def launch_task(self, nombre, descripcion, *args, **kwargs):
         """Arrancar tarea"""

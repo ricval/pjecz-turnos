@@ -142,7 +142,6 @@ def datatable_json():
                     "url": url_for("usuarios.detail", usuario_id=usuario.id),
                 },
                 "nombre": usuario.nombre,
-                "rol": usuario.rol.nombre,
             }
         )
     # Entregar JSON
@@ -196,7 +195,6 @@ def new():
             apellido_paterno=form.apellido_paterno.data,
             apellido_materno=form.apellido_materno.data,
             email=form.email.data,
-            rol=form.rol.data,
             contrasena=contrasena,
         )
         usuario.save()
@@ -226,7 +224,6 @@ def edit(usuario_id):
         usuario.email = form.email.data
         if form.email.data != "":
             usuario.contrasena = pwd_context.hash(form.contrasena.data)
-        usuario.rol = form.rol.data
         usuario.save()
         bitacora = Bitacora(
             modulo=MODULO,
@@ -241,7 +238,6 @@ def edit(usuario_id):
     form.apellido_paterno.data = usuario.apellido_paterno
     form.apellido_materno.data = usuario.apellido_materno
     form.email.data = usuario.email
-    form.rol.data = usuario.rol
     return render_template("usuarios/edit.jinja2", form=form, usuario=usuario)
 
 
