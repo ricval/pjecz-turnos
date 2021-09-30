@@ -12,7 +12,7 @@ from lib.pwgen import generar_contrasena
 from lib.safe_next_url import safe_next_url
 from lib.safe_string import safe_message
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import anonymous_required, permission_required
 from turnos.extensions import pwd_context
 
@@ -105,21 +105,21 @@ def profile():
 
 @usuarios.route("/usuarios")
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def list_active():
     """Listado de Usuarios activos"""
     return render_template("usuarios/list.jinja2", estatus="A")
 
 
 @usuarios.route("/usuarios/inactivos")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Usuarios inactivos"""
     return render_template("usuarios/list.jinja2", estatus="B")
 
 
 @usuarios.route("/usuarios/datatable_json", methods=["GET", "POST"])
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def datatable_json():
     """DataTable JSON para listado de usuarios"""
     # Tomar parámetros de Datatables
@@ -142,7 +142,6 @@ def datatable_json():
                     "url": url_for("usuarios.detail", usuario_id=usuario.id),
                 },
                 "nombre": usuario.nombre,
-                "rol": usuario.rol.nombre,
             }
         )
     # Entregar JSON
@@ -151,7 +150,7 @@ def datatable_json():
 
 @usuarios.route("/usuarios/<int:usuario_id>")
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def detail(usuario_id):
     """Detalle de un Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -160,7 +159,7 @@ def detail(usuario_id):
 
 @usuarios.route("/usuarios/buscar", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def search():
     """Buscar Usuarios"""
     form_search = UsuarioSearchForm()
@@ -182,7 +181,7 @@ def search():
 
 @usuarios.route("/usuarios/nuevo", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.CREAR_CUENTAS)
+@permission_required(MODULO, Permiso.CREAR)
 def new():
     """Nuevo usuario"""
     form = UsuarioFormNew()
@@ -196,7 +195,6 @@ def new():
             apellido_paterno=form.apellido_paterno.data,
             apellido_materno=form.apellido_materno.data,
             email=form.email.data,
-            rol=form.rol.data,
             contrasena=contrasena,
         )
         usuario.save()
@@ -214,7 +212,7 @@ def new():
 
 @usuarios.route("/usuarios/edicion/<int:usuario_id>", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def edit(usuario_id):
     """Editar Usuario, solo al escribir la contraseña se cambia"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -226,7 +224,6 @@ def edit(usuario_id):
         usuario.email = form.email.data
         if form.email.data != "":
             usuario.contrasena = pwd_context.hash(form.contrasena.data)
-        usuario.rol = form.rol.data
         usuario.save()
         bitacora = Bitacora(
             modulo=MODULO,
@@ -241,12 +238,11 @@ def edit(usuario_id):
     form.apellido_paterno.data = usuario.apellido_paterno
     form.apellido_materno.data = usuario.apellido_materno
     form.email.data = usuario.email
-    form.rol.data = usuario.rol
     return render_template("usuarios/edit.jinja2", form=form, usuario=usuario)
 
 
 @usuarios.route("/usuarios/eliminar/<int:usuario_id>")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def delete(usuario_id):
     """Eliminar Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -264,7 +260,7 @@ def delete(usuario_id):
 
 
 @usuarios.route("/usuarios/recuperar/<int:usuario_id>")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def recover(usuario_id):
     """Recuperar Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)

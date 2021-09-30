@@ -10,8 +10,14 @@ import click
 
 from turnos.app import create_app
 from turnos.extensions import db
+
+from cli.commands.alimentar_autoridades import alimentar_autoridades
+from cli.commands.alimentar_distritos import alimentar_distritos
+from cli.commands.alimentar_modulos import alimentar_modulos
+from cli.commands.alimentar_permisos import alimentar_permisos
 from cli.commands.alimentar_roles import alimentar_roles
 from cli.commands.alimentar_usuarios import alimentar_usuarios
+from cli.commands.alimentar_usuarios_roles import alimentar_usuarios_roles
 
 app = create_app()
 db.app = app
@@ -41,8 +47,13 @@ def alimentar():
     if entorno_implementacion == "PRODUCTION":
         click.echo("PROHIBIDO: No se alimenta porque este es el servidor de producción.")
         return
+    alimentar_modulos()
     alimentar_roles()
+    alimentar_permisos()
+    alimentar_distritos()
+    alimentar_autoridades()
     alimentar_usuarios()
+    alimentar_usuarios_roles()
     click.echo("Alimentado.")
 
 

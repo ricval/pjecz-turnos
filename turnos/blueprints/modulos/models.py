@@ -1,15 +1,15 @@
 """
-Roles, modelos
+Modulos, modelos
 """
 from turnos.extensions import db
 from lib.universal_mixin import UniversalMixin
 
 
-class Rol(db.Model, UniversalMixin):
-    """Rol"""
+class Modulo(db.Model, UniversalMixin):
+    """Modulo"""
 
     # Nombre de la tabla
-    __tablename__ = "roles"
+    __tablename__ = "modulos"
 
     # Clave primaria
     id = db.Column(db.Integer, primary_key=True)
@@ -18,9 +18,8 @@ class Rol(db.Model, UniversalMixin):
     nombre = db.Column(db.String(256), unique=True, nullable=False)
 
     # Hijos
-    permisos = db.relationship('Permiso', back_populates='rol')
-    usuarios_roles = db.relationship("UsuarioRol", back_populates="rol")
+    permisos = db.relationship('Permiso', back_populates='modulo')
 
     def __repr__(self):
         """Representación"""
-        return f"<Rol {self.nombre}>"
+        return f"<Modulo {self.nombre}>"

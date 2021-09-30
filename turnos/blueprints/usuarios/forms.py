@@ -3,18 +3,10 @@ Usuarios, formularios
 """
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, PasswordField, StringField, SubmitField
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional, Regexp
-
-from turnos.blueprints.roles.models import Rol
 
 CONTRASENA_REGEXP = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,48}$"
 CONTRASENA_MENSAJE = "De 8 a 48 caracteres con al menos una mayúscula, una minúscula y un número. No acentos, ni eñe."
-
-
-def roles_opciones():
-    """ Roles: opciones para select """
-    return Rol.query.filter_by(estatus="A").order_by(Rol.nombre).all()
 
 
 class AccesoForm(FlaskForm):
@@ -35,7 +27,6 @@ class UsuarioFormNew(FlaskForm):
     apellido_paterno = StringField("Apellido paterno", validators=[DataRequired(), Length(max=256)])
     apellido_materno = StringField("Apellido materno", validators=[Optional(), Length(max=256)])
     email = StringField("e-mail", validators=[DataRequired(), Email()])
-    rol = QuerySelectField(query_factory=roles_opciones, get_label="nombre")
     contrasena = PasswordField(
         "Contraseña",
         validators=[
@@ -55,7 +46,6 @@ class UsuarioFormEdit(FlaskForm):
     apellido_paterno = StringField("Apellido paterno", validators=[DataRequired(), Length(max=256)])
     apellido_materno = StringField("Apellido materno", validators=[Optional(), Length(max=256)])
     email = StringField("e-mail", validators=[DataRequired(), Email()])
-    rol = QuerySelectField(query_factory=roles_opciones, get_label="nombre")
     contrasena = PasswordField(
         "Contraseña",
         validators=[

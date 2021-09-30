@@ -21,12 +21,10 @@
                 </tr>
             </thead>
             <tbody>
-                {% for usuario in usuarios: %}
                 <tr>
-                    <td><a href="{{ url_for('usuarios.detail', usuario_id=usuario.id) }}">{{ usuario.nombre }}</a></td>
-                    <td>{{ usuario.email }}</td>
+                    <td>PENDIENTE</td>
+                    <td>PENDIENTE</td>
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
         {% endcall %}
@@ -34,5 +32,7 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ detail.datatable('usuarios_datatable') }}
+    {% if usuarios %}
+        {{ detail.datatable('usuarios_datatable') }}
+    {% endif %}
 {% endblock %}

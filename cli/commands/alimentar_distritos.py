@@ -1,32 +1,34 @@
 """
-Alimentar roles
+Alimentar distritos
 """
 from pathlib import Path
 import csv
 import click
 
-from turnos.blueprints.roles.models import Rol
+from turnos.blueprints.distritos.models import Distrito
 
-ROLES_CSV = "seed/roles_permisos.csv"
+DISTRITOS_CSV = "seed/distritos.csv"
 
 
-def alimentar_roles():
-    """Alimentar roles"""
-    ruta = Path(ROLES_CSV)
+def alimentar_distritos():
+    """Alimentar distritos"""
+    ruta = Path(DISTRITOS_CSV)
     if not ruta.exists():
         click.echo(f"AVISO: {ruta.name} no se encontró.")
         return
     if not ruta.is_file():
         click.echo(f"AVISO: {ruta.name} no es un archivo.")
         return
-    click.echo("Alimentando roles...")
+    click.echo("Alimentando distritos...")
     contador = 0
     with open(ruta, encoding="utf8") as puntero:
         rows = csv.DictReader(puntero)
         for row in rows:
-            Rol(
+            Distrito(
                 nombre=row["nombre"],
+                nombre_corto=row["nombre_corto"],
+                es_distrito_judicial=(row["es_distrito_judicial"] == "1"),
                 estatus=row["estatus"],
             ).save()
             contador += 1
-    click.echo(f"  {contador} roles alimentados.")
+    click.echo(f"  {contador} distritos alimentados.")

@@ -6,6 +6,8 @@ from flask_login import UserMixin
 
 from lib.universal_mixin import UniversalMixin
 from turnos.extensions import db, pwd_context
+from turnos.blueprints.modulos.models import Modulo
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.tareas.models import Tarea
 
 
@@ -18,9 +20,9 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     # Clave primaria
     id = db.Column(db.Integer(), primary_key=True)
 
-    # Claves foráneas
-    rol_id = db.Column(db.Integer, db.ForeignKey("roles.id"), index=True, nullable=False)
-    rol = db.relationship("Rol", back_populates="usuarios")
+    # Clave foránea
+    autoridad_id = db.Column(db.Integer, db.ForeignKey("autoridades.id"), index=True, nullable=False)
+    autoridad = db.relationship("Autoridad", back_populates="usuarios")
 
     # Columnas
     email = db.Column(db.String(256), unique=True, index=True)
@@ -28,11 +30,14 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     nombres = db.Column(db.String(256), nullable=False)
     apellido_paterno = db.Column(db.String(256), nullable=False)
     apellido_materno = db.Column(db.String(256))
+    curp = db.Column(db.String(256), unique=True)
+    puesto = db.Column(db.String(256))
 
     # Hijos
     bitacoras = db.relationship("Bitacora", back_populates="usuario", lazy="noload")
     entradas_salidas = db.relationship("EntradaSalida", back_populates="usuario", lazy="noload")
     tareas = db.relationship("Tarea", back_populates="usuario", lazy="noload")
+    usuarios_roles = db.relationship("UsuarioRol", back_populates="usuario")
 
     @property
     def nombre(self):
@@ -55,25 +60,33 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
             return pwd_context.verify(password, self.contrasena)
         return True
 
-    def can(self, perm):
+    def can(self, module, permission):
         """¿Tiene permiso?"""
-        return self.rol.has_permission(perm)
+        modulo = Modulo.query.filter_by(nombre=module).first()
+        if modulo is None:
+            return False
+        maximo = 0
+        for usuario_rol in self.usuarios_roles:
+            for permiso in usuario_rol.rol.permisos:
+                if permiso.modulo == modulo and permiso.nivel > maximo:
+                    maximo = permiso.nivel
+        return maximo >= permission
 
     def can_view(self, module):
         """¿Tiene permiso para ver?"""
-        return self.rol.can_view(module)
-
-    def can_insert(self, module):
-        """¿Tiene permiso para agregar?"""
-        return self.rol.can_insert(module)
+        return self.can(module, Permiso.VER)
 
     def can_edit(self, module):
         """¿Tiene permiso para editar?"""
-        return self.rol.can_edit(module)
+        return self.can(module, Permiso.MODIFICAR)
+
+    def can_insert(self, module):
+        """¿Tiene permiso para agregar?"""
+        return self.can(module, Permiso.CREAR)
 
     def can_admin(self, module):
         """¿Tiene permiso para administrar?"""
-        return self.rol.can_admin(module)
+        return self.can(module, Permiso.ADMINISTRAR)
 
     def launch_task(self, nombre, descripcion, *args, **kwargs):
         """Arrancar tarea"""

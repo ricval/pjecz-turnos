@@ -12,6 +12,5 @@
     {% call detail.card() %}
         {{ detail.label_value_big('Nombre', current_user.nombre) }}
         {{ detail.label_value('e-mail', current_user.email) }}
-        {{ detail.label_value('Rol', current_user.rol.nombre) }}
     {% endcall %}
 {% endblock %}
