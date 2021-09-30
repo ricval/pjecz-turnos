@@ -11,28 +11,53 @@
 {% endblock %}
 
 {% block content %}
-    {% if usuarios %}
-        {% call detail.card('Usuarios') %}
+    {% call detail.card('Permisos') %}
+        <table id="permisos_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Modulos</th>
+                    <th>Niveles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for permiso in rol.permisos %}
+                <tr>
+                    <td>{{ permiso.modulo.nombre }}</td>
+                    <td>
+                        {% if permiso.nivel == 4 %}ADMINISTRAR
+                        {% elif permiso.nivel == 3 %}CREAR, EDITAR y VER
+                        {% elif permiso.nivel == 2 %}EDITAR y VER
+                        {% elif permiso.nivel == 1 %}VER
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endcall %}
+    {% call detail.card('Usuarios') %}
         <table id="usuarios_datatable" class="table display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>Usuarios</th>
+                    <th>Nombres</th>
+                    <th>Puestos</th>
                     <th>e-mail</th>
                 </tr>
             </thead>
             <tbody>
+                {% for usuario_rol in rol.usuarios_roles %}
                 <tr>
-                    <td>PENDIENTE</td>
-                    <td>PENDIENTE</td>
+                    <td>{{ usuario_rol.usuario.nombre }}</td>
+                    <td>{{ usuario_rol.usuario.puesto }}</td>
+                    <td>{{ usuario_rol.usuario.email }}</td>
                 </tr>
+                {% endfor %}
             </tbody>
         </table>
-        {% endcall %}
-    {% endif %}
+    {% endcall %}
 {% endblock %}
 
 {% block custom_javascript %}
-    {% if usuarios %}
-        {{ detail.datatable('usuarios_datatable') }}
-    {% endif %}
+    {{ detail.datatable('permisos_datatable') }}
+    {{ detail.datatable('usuarios_datatable') }}
 {% endblock %}

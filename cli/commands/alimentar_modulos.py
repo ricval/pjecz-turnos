@@ -25,7 +25,7 @@ def alimentar_modulos():
         rows = csv.DictReader(puntero)
         for row in rows:
             Modulo(
-                nombre=row["nombre"],
+                nombre=row["nombre"].upper(),
                 estatus=row["estatus"],
             ).save()
             contador += 1

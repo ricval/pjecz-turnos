@@ -38,6 +38,8 @@ def alimentar_usuarios():
                 nombres=row["nombres"],
                 apellido_paterno=row["apellido_paterno"],
                 apellido_materno=row["apellido_materno"],
+                curp=row["curp"],
+                puesto=row["puesto"],
                 estatus=row["estatus"],
                 contrasena=pwd_context.hash(generar_contrasena()),
             ).save()

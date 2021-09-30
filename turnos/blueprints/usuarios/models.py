@@ -25,13 +25,13 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     autoridad = db.relationship("Autoridad", back_populates="usuarios")
 
     # Columnas
-    email = db.Column(db.String(256), unique=True, index=True)
+    email = db.Column(db.String(256), nullable=False, unique=True, index=True)
     contrasena = db.Column(db.String(256), nullable=False)
     nombres = db.Column(db.String(256), nullable=False)
     apellido_paterno = db.Column(db.String(256), nullable=False)
     apellido_materno = db.Column(db.String(256))
-    curp = db.Column(db.String(256), unique=True)
-    puesto = db.Column(db.String(256))
+    curp = db.Column(db.String(256), nullable=False)
+    puesto = db.Column(db.String(256), nullable=False)
 
     # Hijos
     bitacoras = db.relationship("Bitacora", back_populates="usuario", lazy="noload")
