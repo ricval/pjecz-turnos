@@ -26,7 +26,7 @@ class Permiso(db.Model, UniversalMixin):
     modulo = db.relationship("Modulo", back_populates="permisos")
 
     # Columnas
-    nombre = db.Column(db.String(256), unique=True, nullable=False)
+    nombre = db.Column(db.String(256), nullable=False, unique=True)
     nivel = db.Column(db.Integer(), nullable=False)
 
     def __repr__(self):

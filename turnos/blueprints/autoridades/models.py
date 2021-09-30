@@ -25,7 +25,7 @@ class Autoridad(db.Model, UniversalMixin):
     es_jurisdiccional = db.Column(db.Boolean, nullable=False, default=False)
 
     # Hijos
-    usuarios = db.relationship("Usuario", back_populates="Autoridad")
+    usuarios = db.relationship("Usuario", back_populates="autoridad")
 
     def __repr__(self):
         """Representación"""
