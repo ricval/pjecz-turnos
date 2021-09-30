@@ -4,16 +4,18 @@ Distritos, vistas
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.distritos.models import Distrito
 
 distritos = Blueprint('distritos', __name__, template_folder='templates')
 
+MODULO = "DISTRITOS"
+
 
 @distritos.before_request
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def before_request():
     """ Permiso por defecto """
 
@@ -26,7 +28,7 @@ def list_active():
 
 
 @distritos.route('/distritos/inactivos')
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """ Listado de Distritos inactivos """
     distritos_inactivos = Distrito.query.filter(Distrito.estatus == 'B').order_by(Distrito.nombre).all()

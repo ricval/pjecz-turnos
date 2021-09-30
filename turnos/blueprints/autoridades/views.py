@@ -4,16 +4,18 @@ Autoridades, vistas
 from flask import Blueprint, render_template
 from flask_login import login_required
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.autoridades.models import Autoridad
 
 autoridades = Blueprint("autoridades", __name__, template_folder="templates")
 
+MODULO = "AUTORIDADES"
+
 
 @autoridades.before_request
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def before_request():
     """Permiso por defecto"""
 
@@ -26,7 +28,7 @@ def list_active():
 
 
 @autoridades.route("/autoridades/inactivos")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Autoridades inactivos"""
     autoridades_inactivos = Autoridad.query.filter(Autoridad.estatus == "B").order_by(Autoridad.nombre).limit(100).all()

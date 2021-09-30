@@ -4,16 +4,18 @@ Modulos, vistas
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.modulos.models import Modulo
 
 modulos = Blueprint("modulos", __name__, template_folder="templates")
 
+MODULO = "MODULOS"
+
 
 @modulos.before_request
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def before_request():
     """Permiso por defecto"""
 
@@ -26,7 +28,7 @@ def list_active():
 
 
 @modulos.route("/modulos/inactivos")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Modulos inactivos"""
     modulos_inactivos = Modulo.query.filter_by(estatus="B").order_by(Modulo.nombre).limit(100).all()

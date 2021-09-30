@@ -23,7 +23,7 @@ def anonymous_required(url="/"):
     return decorator
 
 
-def permission_required(perm):
+def permission_required(module, permission):
     """¿Tiene permiso para estar en esta página?"""
 
     def decorator(f):
@@ -31,7 +31,7 @@ def permission_required(perm):
 
         @wraps(f)
         def decorated_function(*args, **kwargs):
-            if not current_user.can(perm):
+            if not current_user.can(module, permission):
                 abort(403)
             return f(*args, **kwargs)
 

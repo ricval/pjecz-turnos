@@ -6,16 +6,18 @@ from flask_login import login_required
 
 from lib import datatables
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.bitacoras.models import Bitacora
 
 bitacoras = Blueprint("bitacoras", __name__, template_folder="templates")
 
+MODULO = "BITACORAS"
+
 
 @bitacoras.route("/bitacoras")
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def list_active():
     """Listado de bitácoras"""
     return render_template("bitacoras/list.jinja2")
@@ -23,7 +25,7 @@ def list_active():
 
 @bitacoras.route("/bitacoras/datatable_json", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def datatable_json():
     """DataTable JSON para listado de listado de bitácoras"""
     # Tomar parámetros de Datatables

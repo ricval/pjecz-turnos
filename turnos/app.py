@@ -11,10 +11,13 @@ from turnos.blueprints.autoridades.views import autoridades
 from turnos.blueprints.bitacoras.views import bitacoras
 from turnos.blueprints.distritos.views import distritos
 from turnos.blueprints.entradas_salidas.views import entradas_salidas
+from turnos.blueprints.modulos.views import modulos
+from turnos.blueprints.permisos.views import permisos
 from turnos.blueprints.roles.views import roles
 from turnos.blueprints.sistemas.views import sistemas
 from turnos.blueprints.tareas.views import tareas
 from turnos.blueprints.usuarios.views import usuarios
+from turnos.blueprints.usuarios_roles.views import usuarios_roles
 
 from turnos.blueprints.usuarios.models import Usuario
 
@@ -35,10 +38,13 @@ def create_app():
     app.register_blueprint(bitacoras)
     app.register_blueprint(distritos)
     app.register_blueprint(entradas_salidas)
+    app.register_blueprint(modulos)
+    app.register_blueprint(permisos)
     app.register_blueprint(roles)
     app.register_blueprint(sistemas)
     app.register_blueprint(tareas)
     app.register_blueprint(usuarios)
+    app.register_blueprint(usuarios_roles)
     # Cargar las extensiones
     extensions(app)
     authentication(Usuario)

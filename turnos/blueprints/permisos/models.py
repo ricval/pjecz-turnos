@@ -8,6 +8,11 @@ from lib.universal_mixin import UniversalMixin
 class Permiso(db.Model, UniversalMixin):
     """Permiso"""
 
+    VER = 1
+    MODIFICAR = 2
+    CREAR = 3
+    ADMINISTRAR = 4
+
     # Nombre de la tabla
     __tablename__ = "permisos"
 

@@ -12,7 +12,7 @@ from lib.pwgen import generar_contrasena
 from lib.safe_next_url import safe_next_url
 from lib.safe_string import safe_message
 
-from turnos.blueprints.roles.models import Permiso
+from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import anonymous_required, permission_required
 from turnos.extensions import pwd_context
 
@@ -105,21 +105,21 @@ def profile():
 
 @usuarios.route("/usuarios")
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def list_active():
     """Listado de Usuarios activos"""
     return render_template("usuarios/list.jinja2", estatus="A")
 
 
 @usuarios.route("/usuarios/inactivos")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Usuarios inactivos"""
     return render_template("usuarios/list.jinja2", estatus="B")
 
 
 @usuarios.route("/usuarios/datatable_json", methods=["GET", "POST"])
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def datatable_json():
     """DataTable JSON para listado de usuarios"""
     # Tomar parámetros de Datatables
@@ -151,7 +151,7 @@ def datatable_json():
 
 @usuarios.route("/usuarios/<int:usuario_id>")
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def detail(usuario_id):
     """Detalle de un Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -160,7 +160,7 @@ def detail(usuario_id):
 
 @usuarios.route("/usuarios/buscar", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.VER_CUENTAS)
+@permission_required(MODULO, Permiso.VER)
 def search():
     """Buscar Usuarios"""
     form_search = UsuarioSearchForm()
@@ -182,7 +182,7 @@ def search():
 
 @usuarios.route("/usuarios/nuevo", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.CREAR_CUENTAS)
+@permission_required(MODULO, Permiso.CREAR)
 def new():
     """Nuevo usuario"""
     form = UsuarioFormNew()
@@ -214,7 +214,7 @@ def new():
 
 @usuarios.route("/usuarios/edicion/<int:usuario_id>", methods=["GET", "POST"])
 @login_required
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def edit(usuario_id):
     """Editar Usuario, solo al escribir la contraseña se cambia"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -246,7 +246,7 @@ def edit(usuario_id):
 
 
 @usuarios.route("/usuarios/eliminar/<int:usuario_id>")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def delete(usuario_id):
     """Eliminar Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)
@@ -264,7 +264,7 @@ def delete(usuario_id):
 
 
 @usuarios.route("/usuarios/recuperar/<int:usuario_id>")
-@permission_required(Permiso.MODIFICAR_CUENTAS)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def recover(usuario_id):
     """Recuperar Usuario"""
     usuario = Usuario.query.get_or_404(usuario_id)
