@@ -23,16 +23,26 @@ def before_request():
 @autoridades.route("/autoridades")
 def list_active():
     """Listado de Autoridades activos"""
-    autoridades_activos = Autoridad.query.filter(Autoridad.estatus == "A").order_by(Autoridad.nombre).limit(100).all()
-    return render_template("autoridades/list.jinja2", autoridades=autoridades_activos, estatus="A")
+    autoridades_activas = Autoridad.query.filter(Autoridad.estatus == "A").order_by(Autoridad.nombre).limit(100).all()
+    return render_template(
+        "autoridades/list.jinja2",
+        autoridades=autoridades_activas,
+        titulo="Autoridades",
+        estatus="A",
+    )
 
 
 @autoridades.route("/autoridades/inactivos")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Autoridades inactivos"""
-    autoridades_inactivos = Autoridad.query.filter(Autoridad.estatus == "B").order_by(Autoridad.nombre).limit(100).all()
-    return render_template("autoridades/list.jinja2", autoridades=autoridades_inactivos, estatus="B")
+    autoridades_inactivas = Autoridad.query.filter(Autoridad.estatus == "B").order_by(Autoridad.nombre).limit(100).all()
+    return render_template(
+        "autoridades/list.jinja2",
+        autoridades=autoridades_inactivas,
+        titulo="Autoridades inactivas",
+        estatus="B",
+    )
 
 
 @autoridades.route("/autoridades/<int:autoridad_id>")

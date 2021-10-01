@@ -24,7 +24,12 @@ def before_request():
 def list_active():
     """Listado de Modulos activos"""
     modulos_activos = Modulo.query.filter_by(estatus="A").order_by(Modulo.nombre).limit(100).all()
-    return render_template("modulos/list.jinja2", modulos=modulos_activos, estatus="A")
+    return render_template(
+        "modulos/list.jinja2",
+        modulos=modulos_activos,
+        titulo="Módulos",
+        estatus="A",
+    )
 
 
 @modulos.route("/modulos/inactivos")
@@ -32,7 +37,12 @@ def list_active():
 def list_inactive():
     """Listado de Modulos inactivos"""
     modulos_inactivos = Modulo.query.filter_by(estatus="B").order_by(Modulo.nombre).limit(100).all()
-    return render_template("modulos/list.jinja2", modulos=modulos_inactivos, estatus="B")
+    return render_template(
+        "modulos/list.jinja2",
+        modulos=modulos_inactivos,
+        titulo="Módulos inactivos",
+        estatus="B",
+    )
 
 
 @modulos.route("/modulos/<int:modulo_id>")

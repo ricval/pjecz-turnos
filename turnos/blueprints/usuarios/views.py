@@ -108,14 +108,14 @@ def profile():
 @permission_required(MODULO, Permiso.VER)
 def list_active():
     """Listado de Usuarios activos"""
-    return render_template("usuarios/list.jinja2", estatus="A")
+    return render_template("usuarios/list.jinja2", titulo="Usuarios", estatus="A")
 
 
 @usuarios.route("/usuarios/inactivos")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Usuarios inactivos"""
-    return render_template("usuarios/list.jinja2", estatus="B")
+    return render_template("usuarios/list.jinja2", titulo="Usuarios inactivos", estatus="B")
 
 
 @usuarios.route("/usuarios/datatable_json", methods=["GET", "POST"])

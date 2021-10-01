@@ -8,7 +8,7 @@ from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.roles.models import Rol
 
-roles = Blueprint('roles', __name__, template_folder='templates')
+roles = Blueprint("roles", __name__, template_folder="templates")
 
 MODULO = "ROLES"
 
@@ -20,23 +20,33 @@ def before_request():
     """Permiso por defecto"""
 
 
-@roles.route('/roles')
+@roles.route("/roles")
 def list_active():
-    """ Listado de roles """
-    roles_activos = Rol.query.filter(Rol.estatus == 'A').order_by(Rol.nombre).all()
-    return render_template('roles/list.jinja2', roles=roles_activos)
+    """Listado de roles"""
+    roles_activos = Rol.query.filter(Rol.estatus == "A").order_by(Rol.nombre).all()
+    return render_template(
+        "roles/list.jinja2",
+        roles=roles_activos,
+        titulo="Roles",
+        estatus="A",
+    )
 
 
-@roles.route('/roles/inactivos')
+@roles.route("/roles/inactivos")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
-    """ Listado de Roles inactivos """
-    roles_inactivos = Rol.query.filter(Rol.estatus == 'B').order_by(Rol.nombre).all()
-    return render_template('roles/list.jinja2', roles=roles_inactivos, estatus='B')
+    """Listado de Roles inactivos"""
+    roles_inactivos = Rol.query.filter(Rol.estatus == "B").order_by(Rol.nombre).all()
+    return render_template(
+        "roles/list.jinja2",
+        roles=roles_inactivos,
+        titulo="Roles inactivos",
+        estatus="B",
+    )
 
 
-@roles.route('/roles/<int:rol_id>')
+@roles.route("/roles/<int:rol_id>")
 def detail(rol_id):
-    """ Detalle de un rol """
+    """Detalle de un rol"""
     rol = Rol.query.get_or_404(rol_id)
-    return render_template('roles/detail.jinja2', rol=rol)
+    return render_template("roles/detail.jinja2", rol=rol)

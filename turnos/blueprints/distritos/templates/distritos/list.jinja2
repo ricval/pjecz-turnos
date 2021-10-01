@@ -1,0 +1,49 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Departamentos{% endblock %}
+
+{% block topbar_actions %}
+    {% if estatus == 'A' %}{% set title='Departamentos' %}{% endif %}
+    {% if estatus == 'B' %}{% set title='Departamentos inactivos' %}{% endif %}
+    {% call topbar.page_buttons(title) %}
+        {{ topbar.button('Autoridades', url_for('autoridades.list_active'), 'mdi:scale-balance') }}
+        {{ topbar.button('Materias', url_for('materias.list_active'), 'mdi:tag') }}
+        {{ topbar.button('Tipos de Juicios', url_for('materias_tipos_juicios.list_active'), 'mdi:label') }}
+        {% if current_user.can_edit('distritos') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('distritos.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('distritos.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('distritos') %}
+            {{ topbar.button_new('Nuevo Departamento', url_for('distritos.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <table id="distritos_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombres</th>
+                    <th>Nombres cortos</th>
+                    <th>Es judicial</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for distrito in distritos %}
+                <tr>
+                    <td><a href="{{ url_for('distritos.detail', distrito_id=distrito.id) }}">{{ distrito.nombre }}</a></td>
+                    <td>{{ distrito.nombre_corto }}</td>
+                    <td>{% if distrito.es_distrito_judicial %}Judicial{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {{ list.datatable('distritos_datatable') }}
+{% endblock %}

@@ -8,7 +8,7 @@ from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.distritos.models import Distrito
 
-distritos = Blueprint('distritos', __name__, template_folder='templates')
+distritos = Blueprint("distritos", __name__, template_folder="templates")
 
 MODULO = "DISTRITOS"
 
@@ -17,26 +17,36 @@ MODULO = "DISTRITOS"
 @login_required
 @permission_required(MODULO, Permiso.VER)
 def before_request():
-    """ Permiso por defecto """
+    """Permiso por defecto"""
 
 
-@distritos.route('/distritos')
+@distritos.route("/distritos")
 def list_active():
-    """ Listado de Distritos activos """
-    distritos_activos = Distrito.query.filter(Distrito.estatus == 'A').order_by(Distrito.nombre).all()
-    return render_template('distritos/list.jinja2', distritos=distritos_activos, estatus='A')
+    """Listado de Distritos activos"""
+    distritos_activos = Distrito.query.filter(Distrito.estatus == "A").order_by(Distrito.nombre).all()
+    return render_template(
+        "distritos/list.jinja2",
+        distritos=distritos_activos,
+        titulo="Distritos",
+        estatus="A",
+    )
 
 
-@distritos.route('/distritos/inactivos')
+@distritos.route("/distritos/inactivos")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
-    """ Listado de Distritos inactivos """
-    distritos_inactivos = Distrito.query.filter(Distrito.estatus == 'B').order_by(Distrito.nombre).all()
-    return render_template('distritos/list.jinja2', distritos=distritos_inactivos, estatus='B')
+    """Listado de Distritos inactivos"""
+    distritos_inactivos = Distrito.query.filter(Distrito.estatus == "B").order_by(Distrito.nombre).all()
+    return render_template(
+        "distritos/list.jinja2",
+        distritos=distritos_inactivos,
+        titulo="Distritos inactivos",
+        estatus="B",
+    )
 
 
-@distritos.route('/distrito/<int:distrito_id>')
+@distritos.route("/distrito/<int:distrito_id>")
 def detail(distrito_id):
-    """ Detalle de un Distrito """
+    """Detalle de un Distrito"""
     distrito = Distrito.query.get_or_404(distrito_id)
-    return render_template('distrito/detail.jinja2', distrito=distrito)
+    return render_template("distrito/detail.jinja2", distrito=distrito)

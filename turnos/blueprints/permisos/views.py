@@ -23,7 +23,12 @@ def before_request():
 def list_active():
     """Listado de Permisos activos"""
     permisos_activos = Permiso.query.filter_by(estatus="A").order_by(Permiso.nombre).all()
-    return render_template("permisos/list.jinja2", permisos=permisos_activos, estatus="A")
+    return render_template(
+        "permisos/list.jinja2",
+        permisos=permisos_activos,
+        titulo="Permisos",
+        estatus="A",
+    )
 
 
 @permisos.route("/permisos/inactivos")
@@ -31,7 +36,12 @@ def list_active():
 def list_inactive():
     """Listado de Permisos inactivos"""
     permisos_inactivos = Permiso.query.filter_by(estatus="B").order_by(Permiso.nombre).all()
-    return render_template("permisos/list.jinja2", permisos=permisos_inactivos, estatus="B")
+    return render_template(
+        "permisos/list.jinja2",
+        permisos=permisos_inactivos,
+        titulo="Permisos inactivos",
+        estatus="B",
+    )
 
 
 @permisos.route("/permisos/<int:permiso_id>")
