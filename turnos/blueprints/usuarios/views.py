@@ -3,6 +3,7 @@ Usuarios, vistas
 """
 import json
 import os
+import re
 
 import google.auth.transport.requests
 import google.oauth2.id_token
@@ -13,7 +14,7 @@ from lib import datatables
 from lib.firebase_auth import firebase_auth
 from lib.pwgen import generar_contrasena
 from lib.safe_next_url import safe_next_url
-from lib.safe_string import safe_message
+from lib.safe_string import CONTRASENA_REGEXP, EMAIL_REGEXP, TOKEN_REGEXP, safe_message
 
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import anonymous_required, permission_required
@@ -40,14 +41,14 @@ def login():
         # Tomar valores del formulario
         identidad = request.form.get("username")
         contrasena = request.form.get("password")
-        id_token = request.form.get("token")
+        token = request.form.get("token")
         siguiente_url = request.form.get("siguiente")
         # Si esta definida la variable de entorno FIREBASE_APIKEY
         if os.environ.get("FIREBASE_APIKEY", "") != "":
             # Entonces debe ingresar con Google/Microsoft/GitHub
-            if id_token != "":
+            if re.fullmatch(TOKEN_REGEXP, token) is not None:
                 # Acceso por Firebase Auth
-                claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
+                claims = google.oauth2.id_token.verify_firebase_token(token, HTTP_REQUEST)
                 if claims:
                     email = claims.get("email", "Unknown")
                     usuario = Usuario.find_by_identity(email)
@@ -69,26 +70,23 @@ def login():
                     flash("Falló la autentificación.", "warning")
             else:
                 flash("Falló la autentificación.", "warning")
-        else:
+        elif re.fullmatch(EMAIL_REGEXP, identidad) is not None and re.fullmatch(CONTRASENA_REGEXP, contrasena) is not None:
             # De lo contrario, el ingreso es con username/password
-            if identidad != "" and contrasena != "":
-                usuario = Usuario.find_by_identity(identidad)
-                if usuario and usuario.authenticated(password=contrasena):
-                    if login_user(usuario, remember=True) and usuario.is_active:
-                        EntradaSalida(
-                            usuario_id=usuario.id,
-                            tipo="INGRESO",
-                            direccion_ip=request.remote_addr,
-                        ).save()
-                        if siguiente_url:
-                            return redirect(safe_next_url(siguiente_url))
-                        return redirect(url_for("sistemas.start"))
-                    else:
-                        flash("No está activa esa cuenta", "warning")
+            usuario = Usuario.find_by_identity(identidad)
+            if usuario and usuario.authenticated(password=contrasena):
+                if login_user(usuario, remember=True) and usuario.is_active:
+                    EntradaSalida(
+                        usuario_id=usuario.id,
+                        tipo="INGRESO",
+                        direccion_ip=request.remote_addr,
+                    ).save()
+                    if siguiente_url:
+                        return redirect(safe_next_url(siguiente_url))
+                    return redirect(url_for("sistemas.start"))
                 else:
-                    flash("Usuario o contraseña incorrectos.", "warning")
+                    flash("No está activa esa cuenta", "warning")
             else:
-                flash("Infomación incompleta.", "warning")
+                flash("Usuario o contraseña incorrectos.", "warning")
     return render_template("usuarios/login.jinja2", form=form, firebase_auth=firebase_auth, title="Turnos")
 
 

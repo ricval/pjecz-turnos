@@ -25,4 +25,5 @@ rq
 sendgrid
 SQLAlchemy
 SQLAlchemy-Utils
+Unidecode
 WTForms
