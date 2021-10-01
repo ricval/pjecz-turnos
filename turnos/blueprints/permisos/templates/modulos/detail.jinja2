@@ -3,27 +3,27 @@
 {% import 'macros/modals.jinja2' as modals %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
-{% block title %}Módulo{% endblock %}
+{% block title %}Permiso{% endblock %}
 
 {% block topbar_actions %}
-    {% call topbar.page_buttons(modulo.nombre) %}
-        {{ topbar.button_previous('Módulos', url_for('modulos.list_active')) }}
-        {% if current_user.can_edit('modulos') %}
-            {% if modulo.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('modulos.delete', modulo_id=modulo.id)) }}{% endif %}
-            {% if modulo.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('modulos.recover', modulo_id=modulo.id)) }}{% endif %}
+    {% call topbar.page_buttons('Permiso ' + permiso.nombre) %}
+        {{ topbar.button_previous('Permisos', url_for('permisos.list_active')) }}
+        {% if current_user.can_edit('permisos') %}
+            {% if permiso.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('permisos.delete', permiso_id=permiso.id)) }}{% endif %}
+            {% if permiso.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('permisos.recover', permiso_id=permiso.id)) }}{% endif %}
         {% endif %}
     {% endcall %}
 {% endblock %}
 
 {% block content %}
-    {% call detail.card(estatus=modulo.estatus) %}
-        {{ detail.label_value_big('Nombre', modulo.nombre) }}
+    {% call detail.card(estatus=permiso.estatus) %}
+        {{ detail.label_value_big('Nombre', permiso.nombre) }}
     {% endcall %}
 {% endblock %}
 
 {% block custom_javascript %}
-    {% if current_user.can_edit('modulos') %}
-        {% if modulo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + modulo.nombre + '?') }}{% endif %}
-        {% if modulo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', 'Recuperar a ' + modulo.nombre + '?') }}{% endif %}
+    {% if current_user.can_edit('permisos') %}
+        {% if permiso.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + permiso.nombre + '?') }}{% endif %}
+        {% if permiso.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', 'Recuperar a ' + permiso.nombre + '?') }}{% endif %}
     {% endif %}
 {% endblock %}

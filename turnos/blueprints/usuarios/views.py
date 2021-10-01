@@ -69,7 +69,7 @@ def login():
                 else:
                     flash("Falló la autentificación.", "warning")
             else:
-                flash("Falló la autentificación.", "warning")
+                flash("Token incorrecto.", "warning")
         elif re.fullmatch(EMAIL_REGEXP, identidad) is not None and re.fullmatch(CONTRASENA_REGEXP, contrasena) is not None:
             # De lo contrario, el ingreso es con username/password
             usuario = Usuario.find_by_identity(identidad)

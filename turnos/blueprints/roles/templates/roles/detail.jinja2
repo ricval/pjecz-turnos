@@ -16,20 +16,20 @@
             <thead>
                 <tr>
                     <th>Modulos</th>
-                    <th>Niveles</th>
+                    <th>Permisos</th>
                 </tr>
             </thead>
             <tbody>
                 {% for permiso in rol.permisos %}
                 <tr>
-                    <td>{{ permiso.modulo.nombre }}</td>
-                    <td>
+                    <td><a href="{{ url_for('modulos.detail', modulo_id=permiso.modulo_id) }}">{{ permiso.modulo.nombre }}</a></td>
+                    <td><a href="{{ url_for('permisos.detail', permiso_id=permiso.id) }}">
                         {% if permiso.nivel == 4 %}ADMINISTRAR
                         {% elif permiso.nivel == 3 %}CREAR, EDITAR y VER
                         {% elif permiso.nivel == 2 %}EDITAR y VER
                         {% elif permiso.nivel == 1 %}VER
                         {% endif %}
-                    </td>
+                    </a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -47,7 +47,7 @@
             <tbody>
                 {% for usuario_rol in rol.usuarios_roles %}
                 <tr>
-                    <td>{{ usuario_rol.usuario.nombre }}</td>
+                    <td><a href="{{ url_for('usuarios.detail', usuario_id=usuario_rol.usuario_id) }}">{{ usuario_rol.usuario.nombre }}</a></td>
                     <td>{{ usuario_rol.usuario.puesto }}</td>
                     <td>{{ usuario_rol.usuario.email }}</td>
                 </tr>

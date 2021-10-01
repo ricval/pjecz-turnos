@@ -62,7 +62,7 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
 
     def can(self, module, permission):
         """¿Tiene permiso?"""
-        modulo = Modulo.query.filter_by(nombre=module).first()
+        modulo = Modulo.query.filter_by(nombre=module.upper()).first()
         if modulo is None:
             return False
         maximo = 0

@@ -3,11 +3,11 @@
 {% import 'macros/modals.jinja2' as modals %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
-{% block title %}Departamento{% endblock %}
+{% block title %}Distrito{% endblock %}
 
 {% block topbar_actions %}
-    {% call topbar.page_buttons('Departamento ' + distrito.nombre) %}
-        {{ topbar.button_previous('Departamentos', url_for('distritos.list_active')) }}
+    {% call topbar.page_buttons('Distrito ' + distrito.nombre) %}
+        {{ topbar.button_previous('Distritos', url_for('distritos.list_active')) }}
         {% if current_user.can_edit('distritos') %}
             {{ topbar.button_edit('Editar', url_for('distritos.edit', distrito_id=distrito.id)) }}
             {% if distrito.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('distritos.delete', distrito_id=distrito.id)) }}{% endif %}
