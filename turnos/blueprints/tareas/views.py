@@ -24,10 +24,9 @@ def before_request():
 @tareas.route("/tareas")
 def list_active():
     """Listado de Tareas activas"""
-    tareas_activas = Tarea.query.filter_by(estatus="A").order_by(Tarea.creado.desc()).limit(100).all()
     return render_template(
         "tareas/list.jinja2",
-        tareas=tareas_activas,
+        tareas=Tarea.query.filter_by(estatus="A").all(),
         titulo="Tareas",
         estatus="A",
     )
@@ -37,10 +36,9 @@ def list_active():
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Tareas inactivas"""
-    tareas_inactivas = Tarea.query.filter_by(estatus="B").order_by(Tarea.creado.desc()).limit(100).all()
     return render_template(
         "tareas/list.jinja2",
-        tareas=tareas_inactivas,
+        tareas=Tarea.query.filter_by(estatus="B").all(),
         titulo="Tareas inactivas",
         estatus="B",
     )

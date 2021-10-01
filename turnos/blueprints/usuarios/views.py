@@ -1,6 +1,9 @@
 """
 Usuarios, vistas
 """
+import json
+import os
+
 import google.auth.transport.requests
 import google.oauth2.id_token
 from flask import Blueprint, flash, redirect, request, render_template, url_for
@@ -34,19 +37,43 @@ def login():
     """Acceso al Sistema"""
     form = AccesoForm(siguiente=request.args.get("siguiente"))
     if form.validate_on_submit():
-        # Validar
-        identidad = request.form.get("identidad")
-        contrasena = request.form.get("contrasena")
+        # Tomar valores del formulario
+        identidad = request.form.get("username")
+        contrasena = request.form.get("password")
         id_token = request.form.get("token")
         siguiente_url = request.form.get("siguiente")
-        # Elegir
-        if id_token != "" and (identidad == "" and contrasena == ""):
-            # Acceso por Firebase Auth
-            claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
-            if claims:
-                email = claims.get("email", "Unknown")
-                usuario = Usuario.find_by_identity(email)
-                if usuario and usuario.authenticated(with_password=False):
+        # Si esta definida la variable de entorno FIREBASE_APIKEY
+        if os.environ.get("FIREBASE_APIKEY", "") != "":
+            # Entonces debe ingresar con Google/Microsoft/GitHub
+            if id_token != "":
+                # Acceso por Firebase Auth
+                claims = google.oauth2.id_token.verify_firebase_token(id_token, HTTP_REQUEST)
+                if claims:
+                    email = claims.get("email", "Unknown")
+                    usuario = Usuario.find_by_identity(email)
+                    if usuario and usuario.authenticated(with_password=False):
+                        if login_user(usuario, remember=True) and usuario.is_active:
+                            EntradaSalida(
+                                usuario_id=usuario.id,
+                                tipo="INGRESO",
+                                direccion_ip=request.remote_addr,
+                            ).save()
+                            if siguiente_url:
+                                return redirect(safe_next_url(siguiente_url))
+                            return redirect(url_for("sistemas.start"))
+                        else:
+                            flash("No está activa esa cuenta.", "warning")
+                    else:
+                        flash("No existe esa cuenta.", "warning")
+                else:
+                    flash("Falló la autentificación.", "warning")
+            else:
+                flash("Falló la autentificación.", "warning")
+        else:
+            # De lo contrario, el ingreso es con username/password
+            if identidad != "" and contrasena != "":
+                usuario = Usuario.find_by_identity(identidad)
+                if usuario and usuario.authenticated(password=contrasena):
                     if login_user(usuario, remember=True) and usuario.is_active:
                         EntradaSalida(
                             usuario_id=usuario.id,
@@ -56,29 +83,12 @@ def login():
                         if siguiente_url:
                             return redirect(safe_next_url(siguiente_url))
                         return redirect(url_for("sistemas.start"))
-                    flash("No está activa esa cuenta.", "warning")
+                    else:
+                        flash("No está activa esa cuenta", "warning")
                 else:
-                    flash("No existe esa cuenta.", "warning")
+                    flash("Usuario o contraseña incorrectos.", "warning")
             else:
-                flash("Falló la autentificación.", "warning")
-        elif identidad != "" and contrasena != "":
-            # Acceso por usuario y contraseña
-            usuario = Usuario.find_by_identity(identidad)
-            if usuario and usuario.authenticated(password=contrasena):
-                if login_user(usuario, remember=True) and usuario.is_active:
-                    EntradaSalida(
-                        usuario_id=usuario.id,
-                        tipo="INGRESO",
-                        direccion_ip=request.remote_addr,
-                    ).save()
-                    if siguiente_url:
-                        return redirect(safe_next_url(siguiente_url))
-                    return redirect(url_for("sistemas.start"))
-                flash("No está activa esa cuenta", "warning")
-            else:
-                flash("Usuario o contraseña incorrectos.", "warning")
-        else:
-            flash("Infomación incompleta.", "warning")
+                flash("Infomación incompleta.", "warning")
     return render_template("usuarios/login.jinja2", form=form, firebase_auth=firebase_auth, title="Turnos")
 
 
@@ -108,17 +118,29 @@ def profile():
 @permission_required(MODULO, Permiso.VER)
 def list_active():
     """Listado de Usuarios activos"""
-    return render_template("usuarios/list.jinja2", titulo="Usuarios", estatus="A")
+    return render_template(
+        "usuarios/list.jinja2",
+        filtros=json.dumps({"estatus": "A"}),
+        titulo="Usuarios",
+        estatus="A",
+    )
 
 
 @usuarios.route("/usuarios/inactivos")
+@login_required
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Usuarios inactivos"""
-    return render_template("usuarios/list.jinja2", titulo="Usuarios inactivos", estatus="B")
+    return render_template(
+        "usuarios/list.jinja2",
+        filtros=json.dumps({"estatus": "B"}),
+        titulo="Usuarios inactivos",
+        estatus="B",
+    )
 
 
 @usuarios.route("/usuarios/datatable_json", methods=["GET", "POST"])
+@login_required
 @permission_required(MODULO, Permiso.VER)
 def datatable_json():
     """DataTable JSON para listado de usuarios"""
@@ -243,6 +265,7 @@ def edit(usuario_id):
 
 
 @usuarios.route("/usuarios/eliminar/<int:usuario_id>")
+@login_required
 @permission_required(MODULO, Permiso.MODIFICAR)
 def delete(usuario_id):
     """Eliminar Usuario"""
@@ -261,6 +284,7 @@ def delete(usuario_id):
 
 
 @usuarios.route("/usuarios/recuperar/<int:usuario_id>")
+@login_required
 @permission_required(MODULO, Permiso.MODIFICAR)
 def recover(usuario_id):
     """Recuperar Usuario"""

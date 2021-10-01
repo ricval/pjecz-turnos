@@ -46,8 +46,8 @@ function initApp() {
             var welcomeUser = displayName ? displayName : email;
             document.getElementById('user').textContent = welcomeUser;
             // Account details
-            document.getElementById('account').style.display = 'inline';
-            document.getElementById('account-details').textContent = JSON.stringify(user, null, '  ');
+            //document.getElementById('account').style.display = 'inline';
+            //document.getElementById('account-details').textContent = JSON.stringify(user, null, '  ');
             // Fill form
             user.getIdToken().then(function (idToken) {
                 document.getElementById('email').setAttribute('value', user.email);
@@ -73,7 +73,7 @@ function initApp() {
             document.getElementById('firebase-logged-out').style.display = 'inline';
             document.getElementById('firebase-logged-in').style.display = 'none';
             document.getElementById('access-form-firebase').style.display = 'none';
-            document.getElementById('account-details').textContent = 'null';
+            //document.getElementById('account-details').textContent = 'null';
         }
     });
     // Add listeners in buttons

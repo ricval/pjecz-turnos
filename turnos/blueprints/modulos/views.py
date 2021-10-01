@@ -23,10 +23,9 @@ def before_request():
 @modulos.route("/modulos")
 def list_active():
     """Listado de Modulos activos"""
-    modulos_activos = Modulo.query.filter_by(estatus="A").order_by(Modulo.nombre).limit(100).all()
     return render_template(
         "modulos/list.jinja2",
-        modulos=modulos_activos,
+        modulos=Modulo.query.filter_by(estatus="A").all(),
         titulo="Módulos",
         estatus="A",
     )
@@ -36,10 +35,9 @@ def list_active():
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Modulos inactivos"""
-    modulos_inactivos = Modulo.query.filter_by(estatus="B").order_by(Modulo.nombre).limit(100).all()
     return render_template(
         "modulos/list.jinja2",
-        modulos=modulos_inactivos,
+        modulos=Modulo.query.filter_by(estatus="B").all(),
         titulo="Módulos inactivos",
         estatus="B",
     )

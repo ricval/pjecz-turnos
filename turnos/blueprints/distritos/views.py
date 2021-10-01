@@ -23,10 +23,9 @@ def before_request():
 @distritos.route("/distritos")
 def list_active():
     """Listado de Distritos activos"""
-    distritos_activos = Distrito.query.filter(Distrito.estatus == "A").order_by(Distrito.nombre).all()
     return render_template(
         "distritos/list.jinja2",
-        distritos=distritos_activos,
+        distritos=Distrito.query.filter(Distrito.estatus == "A").all(),
         titulo="Distritos",
         estatus="A",
     )
@@ -36,10 +35,9 @@ def list_active():
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Distritos inactivos"""
-    distritos_inactivos = Distrito.query.filter(Distrito.estatus == "B").order_by(Distrito.nombre).all()
     return render_template(
         "distritos/list.jinja2",
-        distritos=distritos_inactivos,
+        distritos=Distrito.query.filter(Distrito.estatus == "B").all(),
         titulo="Distritos inactivos",
         estatus="B",
     )

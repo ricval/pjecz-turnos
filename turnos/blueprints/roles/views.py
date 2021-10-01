@@ -23,10 +23,9 @@ def before_request():
 @roles.route("/roles")
 def list_active():
     """Listado de roles"""
-    roles_activos = Rol.query.filter(Rol.estatus == "A").order_by(Rol.nombre).all()
     return render_template(
         "roles/list.jinja2",
-        roles=roles_activos,
+        roles=Rol.query.filter(Rol.estatus == "A").all(),
         titulo="Roles",
         estatus="A",
     )
@@ -36,10 +35,9 @@ def list_active():
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Roles inactivos"""
-    roles_inactivos = Rol.query.filter(Rol.estatus == "B").order_by(Rol.nombre).all()
     return render_template(
         "roles/list.jinja2",
-        roles=roles_inactivos,
+        roles=Rol.query.filter(Rol.estatus == "B").all(),
         titulo="Roles inactivos",
         estatus="B",
     )
