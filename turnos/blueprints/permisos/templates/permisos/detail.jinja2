@@ -17,7 +17,8 @@
 
 {% block content %}
     {% call detail.card(estatus=permiso.estatus) %}
-        {{ detail.label_value_big('Nombre', permiso.nombre) }}
+        {{ detail.label_value('Rol', permiso.rol.nombre) }}
+        {{ detail.label_value('Módulo', permiso.modulo.nombre) }}
     {% endcall %}
 {% endblock %}
 
