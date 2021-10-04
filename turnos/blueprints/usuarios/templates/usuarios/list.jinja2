@@ -6,11 +6,17 @@
 
 {% block topbar_actions %}
     {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_view('modulos') %}
+            {{ topbar.button('Módulos', url_for('modulos.list_active'), 'mdi:toy-brick') }}
+        {% endif %}
         {% if current_user.can_view('permisos') %}
             {{ topbar.button('Permisos', url_for('permisos.list_active'), 'mdi:lock') }}
         {% endif %}
         {% if current_user.can_view('roles') %}
             {{ topbar.button('Roles', url_for('roles.list_active'), 'mdi:gamepad') }}
+        {% endif %}
+        {% if current_user.can_view('usuarios roles') %}
+            {{ topbar.button('Usuarios-Roles', url_for('usuarios_roles.list_active'), 'mdi:account-group') }}
         {% endif %}
         {% if current_user.can_edit('usuarios') %}
             {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('usuarios.list_inactive')) }}{% endif %}

@@ -9,7 +9,8 @@ from lib.safe_string import safe_message, safe_string
 from turnos.blueprints.bitacoras.models import Bitacora
 from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
-from turnos.blueprints.permisos.forms import PermisoForm
+from turnos.blueprints.permisos.forms import PermisoNewForm, PermisoEditForm
+from turnos.blueprints.roles.models import Rol
 from turnos.blueprints.usuarios.decorators import permission_required
 
 MODULO = "PERMISOS"
@@ -57,13 +58,13 @@ def detail(permiso_id):
 @permisos.route("/permisos/nuevo", methods=["GET", "POST"])
 @permission_required(MODULO, Permiso.CREAR)
 def new():
-    """Nuevo Modulo"""
-    form = PermisoForm()
+    """Nuevo Permiso"""
+    form = PermisoNewForm()
     if form.validate_on_submit():
         modulo = form.modulo.data
         rol = form.rol.data
         nivel = form.nivel.data
-        nombre = safe_string(f"Para {rol.nombre} en {modulo.nombre}")
+        nombre = safe_string(f"{rol.nombre} puede {Permiso.NIVELES[nivel]} en {modulo.nombre}")
         if Permiso.query.filter(Permiso.modulo == modulo).filter(Permiso.rol == rol).first() is not None:
             flash(f"CONFLICTO: Ya existe {nombre}", "warning")
             return render_template("permisos/new.jinja2", form=form)
@@ -75,7 +76,7 @@ def new():
         )
         permiso.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Nuevo permiso {nombre}"),
             url=url_for("permisos.detail", permiso_id=permiso.id),
@@ -86,20 +87,38 @@ def new():
     return render_template("permisos/new.jinja2", form=form)
 
 
+@permisos.route("/permisos/nuevo_con_rol/<int:rol_id>")
+@permission_required(MODULO, Permiso.CREAR)
+def new_with_rol(rol_id):
+    """Nuevo Permiso con Rol"""
+    rol = Rol.query.get_or_404(rol_id)
+    form = PermisoNewForm()
+    form.rol.data = rol
+    return render_template("permisos/new.jinja2", form=form)
+
+
+@permisos.route("/permisos/nuevo_con_modulo/<int:modulo_id>")
+@permission_required(MODULO, Permiso.CREAR)
+def new_with_modulo(modulo_id):
+    """Nuevo Permiso con Rol"""
+    modulo = Modulo.query.get_or_404(modulo_id)
+    form = PermisoNewForm()
+    form.modulo.data = modulo
+    return render_template("permisos/new.jinja2", form=form)
+
+
 @permisos.route("/permisos/edicion/<int:permiso_id>", methods=["GET", "POST"])
 @permission_required(MODULO, Permiso.MODIFICAR)
 def edit(permiso_id):
     """Editar Permiso"""
     permiso = Permiso.query.get_or_404(permiso_id)
-    form = PermisoForm()
+    form = PermisoEditForm()
     if form.validate_on_submit():
-        permiso.modulo = form.modulo.data
-        permiso.rol = form.rol.data
         permiso.nivel = form.nivel.data
-        permiso.nombre = safe_string(f"Para {permiso.rol.nombre} en {permiso.modulo.nombre}")
+        permiso.nombre = safe_string(f"{permiso.rol.nombre} puede {Permiso.NIVELES[permiso.nivel]} en {permiso.modulo.nombre}")
         permiso.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Editado permiso {permiso.nombre}"),
             url=url_for("permisos.detail", permiso_id=permiso.id),
@@ -107,8 +126,6 @@ def edit(permiso_id):
         bitacora.save()
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
-    form.modulo.data = permiso.modulo
-    form.rol.data = permiso.rol
     form.nivel.data = permiso.nivel
     return render_template("permisos/edit.jinja2", form=form, permiso=permiso)
 
@@ -121,7 +138,7 @@ def delete(permiso_id):
     if permiso.estatus == "A":
         permiso.delete()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Eliminado permiso {permiso.nombre}"),
             url=url_for("permisos.detail", permiso_id=permiso.id),
@@ -140,7 +157,7 @@ def recover(permiso_id):
     if permiso.estatus == "B":
         permiso.recover()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Recuperado permiso {permiso.nombre}"),
             url=url_for("permisos.detail", permiso_id=permiso.id),

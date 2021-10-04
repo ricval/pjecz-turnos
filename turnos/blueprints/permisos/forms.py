@@ -1,6 +1,7 @@
 """
 Permisos, formularios
 """
+from collections import OrderedDict
 from flask_wtf import FlaskForm
 from wtforms import SelectField, SubmitField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -19,18 +20,26 @@ NIVELES = [
 
 
 def modulos_opciones():
-    """ Modulos: opciones para select """
-    return Modulo.query.filter_by(estatus='A').order_by(Modulo.nombre).all()
+    """Modulos: opciones para select"""
+    return Modulo.query.filter_by(estatus="A").order_by(Modulo.nombre).all()
 
 
 def roles_opciones():
-    """ Roles: opciones para select """
-    return Rol.query.filter_by(estatus='A').order_by(Rol.nombre).all()
+    """Roles: opciones para select"""
+    return Rol.query.filter_by(estatus="A").order_by(Rol.nombre).all()
 
 
-class PermisoForm(FlaskForm):
-    """ Formulario Permiso """
-    modulo = QuerySelectField(query_factory=modulos_opciones, get_label='nombre')
-    rol = QuerySelectField(query_factory=roles_opciones, get_label='nombre')
-    nivel = SelectField('Nivel', validators=[DataRequired()], choices=NIVELES, coerce=int)
-    guardar = SubmitField('Guardar')
+class PermisoNewForm(FlaskForm):
+    """Formulario Permiso"""
+
+    modulo = QuerySelectField(query_factory=modulos_opciones, get_label="nombre")
+    rol = QuerySelectField(query_factory=roles_opciones, get_label="nombre")
+    nivel = SelectField("Nivel", validators=[DataRequired()], choices=NIVELES, coerce=int)
+    guardar = SubmitField("Guardar")
+
+
+class PermisoEditForm(FlaskForm):
+    """Formulario Permiso"""
+
+    nivel = SelectField("Nivel", validators=[DataRequired()], choices=NIVELES, coerce=int)
+    guardar = SubmitField("Guardar")

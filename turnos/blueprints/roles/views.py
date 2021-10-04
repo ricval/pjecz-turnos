@@ -64,7 +64,7 @@ def new():
         rol = Rol(nombre=safe_string(form.nombre.data))
         rol.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Nuevo rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -85,7 +85,7 @@ def edit(rol_id):
         rol.nombre = safe_string(form.nombre.data)
         rol.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Editado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -105,7 +105,7 @@ def delete(rol_id):
     if rol.estatus == "A":
         rol.delete()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Eliminado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -124,7 +124,7 @@ def recover(rol_id):
     if rol.estatus == "B":
         rol.recover()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Recuperado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),

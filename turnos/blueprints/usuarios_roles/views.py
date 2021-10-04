@@ -1,13 +1,18 @@
 """
 Usuarios Roles, vistas
 """
-from flask import Blueprint, flash, redirect, render_template, request, url_for
-from flask_login import login_required
+from flask import Blueprint, flash, redirect, render_template, url_for
+from flask_login import current_user, login_required
 
+from lib.safe_string import safe_message
+
+from turnos.blueprints.bitacoras.models import Bitacora
 from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
+from turnos.blueprints.roles.models import Rol
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.usuarios_roles.models import UsuarioRol
+from turnos.blueprints.usuarios_roles.forms import UsuarioRolForm
 
 MODULO = "USUARIOS ROLES"
 
@@ -51,3 +56,81 @@ def detail(usuario_rol_id):
     """Detalle de un Usuario Rol"""
     usuario_rol = UsuarioRol.query.get_or_404(usuario_rol_id)
     return render_template("usuarios_roles/detail.jinja2", usuario_rol=usuario_rol)
+
+
+@usuarios_roles.route("/usuarios_roles/nuevo", methods=["GET", "POST"])
+@permission_required(MODULO, Permiso.CREAR)
+def new():
+    """Nuevo Usuario-Rol"""
+    form = UsuarioRolForm()
+    if form.validate_on_submit():
+        rol = form.rol.data
+        usuario = form.usuario.data
+        descripcion = f"{usuario.email} en {rol.nombre}"
+        if UsuarioRol.query.filter(UsuarioRol.rol == rol).filter(UsuarioRol.usuario == usuario).first() is not None:
+            flash(f"CONFLICTO: Ya existe {descripcion}", "warning")
+            return render_template("usuarios_roles/new.jinja2", form=form)
+        usuario_rol = UsuarioRol(
+            rol=rol,
+            usuario=usuario,
+            descripcion=descripcion,
+        )
+        usuario_rol.save()
+        bitacora = Bitacora(
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+            usuario=current_user,
+            descripcion=safe_message(f"Nuevo usuario-rol {usuario_rol.descripcion}"),
+            url=url_for("usuarios_roles.detail", usuario_rol_id=usuario_rol.id),
+        )
+        bitacora.save()
+        flash(bitacora.descripcion, "success")
+        return redirect(bitacora.url)
+    return render_template("usuarios_roles/new.jinja2", form=form)
+
+
+@usuarios_roles.route("/usuarios_roles/nuevo_con_rol/<int:rol_id>")
+@permission_required(MODULO, Permiso.CREAR)
+def new_with_rol(rol_id):
+    """Nuevo Usuario-Rol con Rol"""
+    rol = Rol.query.get_or_404(rol_id)
+    form = UsuarioRolForm()
+    form.rol.data = rol
+    return render_template("usuarios_roles/new.jinja2", form=form)
+
+
+@usuarios_roles.route("/usuarios_roles/eliminar/<int:usuario_rol_id>")
+@permission_required(MODULO, Permiso.MODIFICAR)
+def delete(usuario_rol_id):
+    """Eliminar Usuario-Rol"""
+    usuario_rol = UsuarioRol.query.get_or_404(usuario_rol_id)
+    if usuario_rol.estatus == "A":
+        usuario_rol.delete()
+        bitacora = Bitacora(
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+            usuario=current_user,
+            descripcion=safe_message(f"Eliminado usuario-rol {usuario_rol.descripcion}"),
+            url=url_for("usuarios_roles.detail", usuario_rol_id=usuario_rol.id),
+        )
+        bitacora.save()
+        flash(bitacora.descripcion, "success")
+        return redirect(bitacora.url)
+    return redirect(url_for("usuarios_roles.detail", usuario_rol_id=usuario_rol.id))
+
+
+@usuarios_roles.route("/usuarios_roles/recuperar/<int:usuario_rol_id>")
+@permission_required(MODULO, Permiso.MODIFICAR)
+def recover(usuario_rol_id):
+    """Recuperar Usuario-Rol"""
+    usuario_rol = UsuarioRol.query.get_or_404(usuario_rol_id)
+    if usuario_rol.estatus == "B":
+        usuario_rol.recover()
+        bitacora = Bitacora(
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
+            usuario=current_user,
+            descripcion=safe_message(f"Eliminado usuario-rol {usuario_rol.descripcion}"),
+            url=url_for("usuarios_roles.detail", usuario_rol_id=usuario_rol.id),
+        )
+        bitacora.save()
+        flash(bitacora.descripcion, "success")
+        return redirect(bitacora.url)
+    return redirect(url_for("usuarios_roles.detail", usuario_rol_id=usuario_rol.id))

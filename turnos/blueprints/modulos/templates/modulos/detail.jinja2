@@ -17,8 +17,30 @@
 {% endblock %}
 
 {% block content %}
-    {% call detail.card(estatus=modulo.estatus) %}
-        {{ detail.label_value_big('Nombre', modulo.nombre) }}
+    {% call detail.card('Permisos') %}
+        <table id="permisos_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Roles</th>
+                    <th>Niveles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for permiso in modulo.permisos %}
+                <tr>
+                    <td><a href="{{ url_for('roles.detail', rol_id=permiso.rol_id) }}">{{ permiso.rol.nombre }}</a></td>
+                    <td><a href="{{ url_for('permisos.detail', permiso_id=permiso.id) }}">
+                        {% if permiso.nivel == 4 %}ADMINISTRAR
+                        {% elif permiso.nivel == 3 %}CREAR, EDITAR y VER
+                        {% elif permiso.nivel == 2 %}EDITAR y VER
+                        {% elif permiso.nivel == 1 %}VER
+                        {% endif %}
+                    </a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('permisos.new_with_modulo', modulo_id=modulo.id) }}" class="btn btn-primary">Agregar</a>
     {% endcall %}
 {% endblock %}
 
@@ -27,4 +49,5 @@
         {% if modulo.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + modulo.nombre + '?') }}{% endif %}
         {% if modulo.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', 'Recuperar a ' + modulo.nombre + '?') }}{% endif %}
     {% endif %}
+    {{ detail.datatable('permisos_datatable') }}
 {% endblock %}

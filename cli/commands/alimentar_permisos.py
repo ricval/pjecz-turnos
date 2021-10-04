@@ -5,6 +5,8 @@ from pathlib import Path
 import csv
 import click
 
+from lib.safe_string import safe_string
+
 from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.roles.models import Rol
@@ -43,17 +45,20 @@ def alimentar_permisos():
                 try:
                     nivel = int(row[columna])
                     if nivel < 0 or nivel > 3:
-                        raise ValueError
+                        click.echo("  Nivel incorrecto.")
+                        continue
                 except ValueError:
                     click.echo("  Se omite un permiso por no ser un número entre 0 y 3")
                     continue
                 if nivel == 0:
                     continue
+                nombre = safe_string(f"{rol.nombre} puede {Permiso.NIVELES[nivel]} en {modulo.nombre}")
                 Permiso(
                     rol=rol,
                     modulo=modulo,
-                    nombre=f"Para {rol.nombre} en {modulo.nombre}",
+                    nombre=nombre,
                     nivel=nivel,
                 ).save()
+                click.echo(f"  {nombre}")
                 contador += 1
     click.echo(f"  {contador} permisos alimentados.")

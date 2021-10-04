@@ -64,16 +64,17 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     def can(self, module, permission):
         """¿Tiene permiso?"""
         if isinstance(module, str):
-            modulo = Modulo.query.filter_by(nombre=module.upper()).first()
+            modulo = Modulo.query.filter_by(nombre=module.upper()).filter_by(estatus="A").first()
             if modulo is None:
                 return False
         elif isinstance(module, Modulo) is False:
             return False
         maximo = 0
         for usuario_rol in self.usuarios_roles:
-            for permiso in usuario_rol.rol.permisos:
-                if permiso.modulo == modulo and permiso.nivel > maximo:
-                    maximo = permiso.nivel
+            if usuario_rol.estatus == "A":
+                for permiso in usuario_rol.rol.permisos:
+                    if permiso.estatus == "A" and permiso.modulo == modulo and permiso.nivel > maximo:
+                        maximo = permiso.nivel
         return maximo >= permission
 
     def can_view(self, module):

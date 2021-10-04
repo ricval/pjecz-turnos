@@ -63,7 +63,7 @@ def new():
         modulo = Modulo(nombre=safe_string(form.nombre.data))
         modulo.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Nuevo módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),
@@ -84,7 +84,7 @@ def edit(modulo_id):
         modulo.nombre = safe_string(form.nombre.data)
         modulo.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Editado módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),
@@ -104,7 +104,7 @@ def delete(modulo_id):
     if modulo.estatus == "A":
         modulo.delete()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Eliminado módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),
@@ -123,7 +123,7 @@ def recover(modulo_id):
     if modulo.estatus == "B":
         modulo.recover()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Recuperado módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),

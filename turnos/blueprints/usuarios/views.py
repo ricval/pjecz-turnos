@@ -205,7 +205,7 @@ def new():
         )
         usuario.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Nuevo usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
@@ -236,7 +236,7 @@ def edit(usuario_id):
             usuario.contrasena = pwd_context.hash(form.contrasena.data)
         usuario.save()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Editado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
@@ -262,7 +262,7 @@ def delete(usuario_id):
     if usuario.estatus == "A":
         usuario.delete()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Eliminado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
@@ -281,7 +281,7 @@ def recover(usuario_id):
     if usuario.estatus == "B":
         usuario.recover()
         bitacora = Bitacora(
-            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
+            modulo=Modulo.query.filter_by(nombre=MODULO).first(),
             usuario=current_user,
             descripcion=safe_message(f"Recuperado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),

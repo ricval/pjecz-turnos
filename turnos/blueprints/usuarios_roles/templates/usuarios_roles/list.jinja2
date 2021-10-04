@@ -2,7 +2,7 @@
 {% import 'macros/list.jinja2' as list %}
 {% import 'macros/topbar.jinja2' as topbar %}
 
-{% block title %}Roles{% endblock %}
+{% block title %}Usuarios-Roles{% endblock %}
 
 {% block topbar_actions %}
     {% call topbar.page_buttons(titulo) %}
@@ -12,36 +12,34 @@
         {% if current_user.can_view('permisos') %}
             {{ topbar.button('Permisos', url_for('permisos.list_active'), 'mdi:lock') }}
         {% endif %}
+        {% if current_user.can_view('roles') %}
+            {{ topbar.button('Roles', url_for('roles.list_active'), 'mdi:gamepad') }}
+        {% endif %}
         {% if current_user.can_view('usuarios') %}
             {{ topbar.button('Usuarios', url_for('usuarios.list_active'), 'mdi:account-key') }}
         {% endif %}
-        {% if current_user.can_view('usuarios roles') %}
-            {{ topbar.button('Usuarios-Roles', url_for('usuarios_roles.list_active'), 'mdi:account-group') }}
+        {% if current_user.can_edit('usuarios roles') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('usuarios_roles.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('usuarios_roles.list_active')) }}{% endif %}
         {% endif %}
-        {% if current_user.can_edit('roles') %}
-            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('roles.list_inactive')) }}{% endif %}
-            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('roles.list_active')) }}{% endif %}
-        {% endif %}
-        {% if current_user.can_insert('roles') %}
-            {{ topbar.button_new('Nuevo Rol', url_for('roles.new')) }}
+        {% if current_user.can_insert('usuarios roles') %}
+            {{ topbar.button_new('Nuevo Usuario-Rol', url_for('usuarios_roles.new')) }}
         {% endif %}
     {% endcall %}
 {% endblock %}
 
 {% block content %}
     {% call list.card() %}
-        <table id="roles_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+        <table id="usuarios_roles_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
             <thead>
                 <tr>
-                    <th>Nombre o descripción</th>
-                    <th>Columna</th>
+                    <th>Descripciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for rol in roles %}
+                {% for usuario_rol in usuarios_roles %}
                 <tr>
-                    <td><a href="{{ url_for('roles.detail', rol_id=rol.id) }}">{{ rol.nombre }}</a></td>
-                    <td>{{ rol.columna }}</td>
+                    <td><a href="{{ url_for('usuarios_roles.detail', usuario_rol_id=usuario_rol.id) }}">{{ usuario_rol.descripcion }}</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -50,5 +48,5 @@
 {% endblock %}
 
 {% block custom_javascript %}
-    {{ list.datatable('roles_datatable') }}
+    {{ list.datatable('usuarios_roles_datatable') }}
 {% endblock %}
