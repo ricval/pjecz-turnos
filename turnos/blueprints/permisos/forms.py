@@ -2,8 +2,12 @@
 Permisos, formularios
 """
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, SubmitField
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms import SelectField, SubmitField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.validators import DataRequired
+
+from turnos.blueprints.modulos.models import Modulo
+from turnos.blueprints.roles.models import Rol
 
 NIVELES = [
     (0, "NULO"),
@@ -14,8 +18,19 @@ NIVELES = [
 ]
 
 
+def modulos_opciones():
+    """ Modulos: opciones para select """
+    return Modulo.query.filter_by(estatus='A').order_by(Modulo.nombre).all()
+
+
+def roles_opciones():
+    """ Roles: opciones para select """
+    return Rol.query.filter_by(estatus='A').order_by(Rol.nombre).all()
+
+
 class PermisoForm(FlaskForm):
     """ Formulario Permiso """
-    nombre = StringField('Nombre', validators=[DataRequired(), Length(max=256)])
+    modulo = QuerySelectField(query_factory=modulos_opciones, get_label='nombre')
+    rol = QuerySelectField(query_factory=roles_opciones, get_label='nombre')
     nivel = SelectField('Nivel', validators=[DataRequired()], choices=NIVELES, coerce=int)
     guardar = SubmitField('Guardar')

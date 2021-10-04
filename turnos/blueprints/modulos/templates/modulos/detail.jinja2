@@ -9,6 +9,7 @@
     {% call topbar.page_buttons('Módulo ' + modulo.nombre) %}
         {{ topbar.button_previous('Módulos', url_for('modulos.list_active')) }}
         {% if current_user.can_edit('modulos') %}
+            {{ topbar.button_edit('Editar', url_for('modulos.edit', modulo_id=modulo.id)) }}
             {% if modulo.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('modulos.delete', modulo_id=modulo.id)) }}{% endif %}
             {% if modulo.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('modulos.recover', modulo_id=modulo.id)) }}{% endif %}
         {% endif %}

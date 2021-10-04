@@ -12,9 +12,9 @@ from turnos.blueprints.modulos.forms import ModuloForm
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 
-modulos = Blueprint("modulos", __name__, template_folder="templates")
-
 MODULO = "MODULOS"
+
+modulos = Blueprint("modulos", __name__, template_folder="templates")
 
 
 @modulos.before_request
@@ -63,7 +63,7 @@ def new():
         modulo = Modulo(nombre=safe_string(form.nombre.data))
         modulo.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Nuevo módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),
@@ -84,7 +84,7 @@ def edit(modulo_id):
         modulo.nombre = safe_string(form.nombre.data)
         modulo.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Editado módulo {modulo.nombre}"),
             url=url_for("modulos.detail", modulo_id=modulo.id),
@@ -96,39 +96,39 @@ def edit(modulo_id):
     return render_template("modulos/edit.jinja2", form=form, modulo=modulo)
 
 
-@modulos.route('/modulos/eliminar/<int:modulo_id>')
+@modulos.route("/modulos/eliminar/<int:modulo_id>")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def delete(modulo_id):
-    """ Eliminar Modulo """
+    """Eliminar Modulo"""
     modulo = Modulo.query.get_or_404(modulo_id)
-    if modulo.estatus == 'A':
+    if modulo.estatus == "A":
         modulo.delete()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
-            descripcion=safe_message(f'Eliminado módulo {modulo.nombre}'),
-            url=url_for('modulos.detail', modulo_id=modulo.id),
+            descripcion=safe_message(f"Eliminado módulo {modulo.nombre}"),
+            url=url_for("modulos.detail", modulo_id=modulo.id),
         )
         bitacora.save()
-        flash(bitacora.descripcion, 'success')
+        flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
-    return redirect(url_for('modulos.detail', modulo_id=modulo.id))
+    return redirect(url_for("modulos.detail", modulo_id=modulo.id))
 
 
-@modulos.route('/modulos/recuperar/<int:modulo_id>')
+@modulos.route("/modulos/recuperar/<int:modulo_id>")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def recover(modulo_id):
-    """ Recuperar Modulo """
+    """Recuperar Modulo"""
     modulo = Modulo.query.get_or_404(modulo_id)
-    if modulo.estatus == 'B':
+    if modulo.estatus == "B":
         modulo.recover()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
-            descripcion=safe_message(f'Recuperado módulo {modulo.nombre}'),
-            url=url_for('modulos.detail', modulo_id=modulo.id),
+            descripcion=safe_message(f"Recuperado módulo {modulo.nombre}"),
+            url=url_for("modulos.detail", modulo_id=modulo.id),
         )
         bitacora.save()
-        flash(bitacora.descripcion, 'success')
+        flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
-    return redirect(url_for('modulos.detail', modulo_id=modulo.id))
+    return redirect(url_for("modulos.detail", modulo_id=modulo.id))

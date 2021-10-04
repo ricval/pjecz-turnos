@@ -20,16 +20,19 @@ from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import anonymous_required, permission_required
 from turnos.extensions import pwd_context
 
+from turnos.blueprints.autoridades.models import Autoridad
 from turnos.blueprints.bitacoras.models import Bitacora
+from turnos.blueprints.distritos.models import Distrito
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.entradas_salidas.models import EntradaSalida
-from turnos.blueprints.usuarios.forms import AccesoForm, UsuarioFormNew, UsuarioFormEdit, UsuarioSearchForm
+from turnos.blueprints.usuarios.forms import AccesoForm, UsuarioFormNew, UsuarioFormEdit
 from turnos.blueprints.usuarios.models import Usuario
 
 HTTP_REQUEST = google.auth.transport.requests.Request()
 
-usuarios = Blueprint("usuarios", __name__, template_folder="templates")
-
 MODULO = "USUARIOS"
+
+usuarios = Blueprint("usuarios", __name__, template_folder="templates")
 
 
 @usuarios.route("/login", methods=["GET", "POST"])
@@ -178,28 +181,6 @@ def detail(usuario_id):
     return render_template("usuarios/detail.jinja2", usuario=usuario)
 
 
-@usuarios.route("/usuarios/buscar", methods=["GET", "POST"])
-@login_required
-@permission_required(MODULO, Permiso.VER)
-def search():
-    """Buscar Usuarios"""
-    form_search = UsuarioSearchForm()
-    if form_search.validate_on_submit():
-        consulta = Usuario.query
-        if form_search.nombres.data:
-            nombres = form_search.nombres.data.strip()
-            consulta = consulta.filter(Usuario.nombres.like(f"%{nombres}%"))
-        if form_search.apellido_paterno.data:
-            apellido_paterno = form_search.apellido_paterno.data.strip()
-            consulta = consulta.filter(Usuario.apellido_paterno.like(f"%{apellido_paterno}%"))
-        if form_search.apellido_materno.data:
-            apellido_materno = form_search.apellido_materno.data.strip()
-            consulta = consulta.filter(Usuario.apellido_materno.like(f"%{apellido_materno}%"))
-        consulta = consulta.limit(100).all()
-        return render_template("usuarios/list.jinja2", usuarios=consulta)
-    return render_template("usuarios/search.jinja2", form=form_search)
-
-
 @usuarios.route("/usuarios/nuevo", methods=["GET", "POST"])
 @login_required
 @permission_required(MODULO, Permiso.CREAR)
@@ -207,28 +188,34 @@ def new():
     """Nuevo usuario"""
     form = UsuarioFormNew()
     if form.validate_on_submit():
+        autoridad = Autoridad.query.get_or_404(form.autoridad.data)
         if form.contrasena.data == "":
             contrasena = pwd_context.hash(generar_contrasena())
         else:
             contrasena = pwd_context.hash(form.contrasena.data)
         usuario = Usuario(
+            autoridad=autoridad,
             nombres=form.nombres.data,
             apellido_paterno=form.apellido_paterno.data,
             apellido_materno=form.apellido_materno.data,
+            curp=form.curp.data,
             email=form.email.data,
+            puesto=form.puesto.data,
             contrasena=contrasena,
         )
         usuario.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
-            descripcion=safe_message(f"Nuevo usuario {usuario.email}: {usuario.nombre} con rol {usuario.rol.nombre}"),
+            descripcion=safe_message(f"Nuevo usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
         )
         bitacora.save()
         flash(bitacora.descripcion, "success")
         return redirect(bitacora.url)
-    return render_template("usuarios/new.jinja2", form=form)
+    distritos = Distrito.query.filter_by(estatus="A").order_by(Distrito.nombre).all()
+    autoridades = Autoridad.query.filter_by(estatus="A").order_by(Autoridad.clave).all()
+    return render_template("usuarios/new.jinja2", form=form, distritos=distritos, autoridades=autoridades)
 
 
 @usuarios.route("/usuarios/edicion/<int:usuario_id>", methods=["GET", "POST"])
@@ -242,14 +229,16 @@ def edit(usuario_id):
         usuario.nombres = form.nombres.data
         usuario.apellido_paterno = form.apellido_paterno.data
         usuario.apellido_materno = form.apellido_materno.data
+        usuario.curp = form.curp.data
         usuario.email = form.email.data
-        if form.email.data != "":
+        usuario.puesto = form.puesto.data
+        if form.contrasena.data != "":
             usuario.contrasena = pwd_context.hash(form.contrasena.data)
         usuario.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
-            descripcion=safe_message(f"Editado usuario {usuario.email}: {usuario.nombre} con rol {usuario.rol.nombre}"),
+            descripcion=safe_message(f"Editado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
         )
         bitacora.save()
@@ -258,7 +247,9 @@ def edit(usuario_id):
     form.nombres.data = usuario.nombres
     form.apellido_paterno.data = usuario.apellido_paterno
     form.apellido_materno.data = usuario.apellido_materno
+    form.curp.data = usuario.curp
     form.email.data = usuario.email
+    form.puesto.data = usuario.puesto
     return render_template("usuarios/edit.jinja2", form=form, usuario=usuario)
 
 
@@ -271,7 +262,7 @@ def delete(usuario_id):
     if usuario.estatus == "A":
         usuario.delete()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Eliminado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),
@@ -290,7 +281,7 @@ def recover(usuario_id):
     if usuario.estatus == "B":
         usuario.recover()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Recuperado usuario {usuario.email}: {usuario.nombre}"),
             url=url_for("usuarios.detail", usuario_id=usuario.id),

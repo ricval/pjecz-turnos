@@ -4,17 +4,18 @@ Roles, vistas
 from flask import Blueprint, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required
 
-from lib.safe_string import safe_message
+from lib.safe_string import safe_message, safe_string
 
 from turnos.blueprints.bitacoras.models import Bitacora
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.roles.models import Rol
 from turnos.blueprints.roles.forms import RolForm
 
-roles = Blueprint("roles", __name__, template_folder="templates")
-
 MODULO = "ROLES"
+
+roles = Blueprint("roles", __name__, template_folder="templates")
 
 
 @roles.before_request
@@ -60,10 +61,10 @@ def new():
     """Nuevo Rol"""
     form = RolForm()
     if form.validate_on_submit():
-        rol = Rol(nombre=form.nombre.data)
+        rol = Rol(nombre=safe_string(form.nombre.data))
         rol.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Nuevo rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -81,10 +82,10 @@ def edit(rol_id):
     rol = Rol.query.get_or_404(rol_id)
     form = RolForm()
     if form.validate_on_submit():
-        rol.nombre = form.nombre.data
+        rol.nombre = safe_string(form.nombre.data)
         rol.save()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Editado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -104,7 +105,7 @@ def delete(rol_id):
     if rol.estatus == "A":
         rol.delete()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Eliminado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),
@@ -123,7 +124,7 @@ def recover(rol_id):
     if rol.estatus == "B":
         rol.recover()
         bitacora = Bitacora(
-            modulo=MODULO,
+            modulo=Modulo.query.filter_by(nombre=MODULO).first()[0],
             usuario=current_user,
             descripcion=safe_message(f"Recuperado rol {rol.nombre}"),
             url=url_for("roles.detail", rol_id=rol.id),

@@ -4,18 +4,19 @@ Usuarios Roles, vistas
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import login_required
 
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 from turnos.blueprints.usuarios_roles.models import UsuarioRol
 
-usuarios_roles = Blueprint("usuarios_roles", __name__, template_folder="templates")
+MODULO = "USUARIOS ROLES"
 
-MODELO = "USUARIOS_ROLES"
+usuarios_roles = Blueprint("usuarios_roles", __name__, template_folder="templates")
 
 
 @usuarios_roles.before_request
 @login_required
-@permission_required(MODELO, Permiso.VER)
+@permission_required(MODULO, Permiso.VER)
 def before_request():
     """Permiso por defecto"""
 
@@ -33,7 +34,7 @@ def list_active():
 
 
 @usuarios_roles.route("/usuarios_roles/inactivos")
-@permission_required(MODELO, Permiso.MODIFICAR)
+@permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Usuarios Roles inactivos"""
     usuarios_roles_inactivos = UsuarioRol.query.filter(UsuarioRol.estatus == "B").all()

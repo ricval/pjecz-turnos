@@ -19,7 +19,9 @@
 {% block content %}
     {% call detail.card(estatus=usuario.estatus) %}
         {{ detail.label_value_big('Nombre', usuario.nombre) }}
+        {{ detail.label_value('CURP', usuario.curp) }}
         {{ detail.label_value('e-mail', usuario.email) }}
+        {{ detail.label_value('Puesto', usuario.puesto) }}
         {{ detail.label_value('Creado', moment(usuario.creado).format('llll')) }}
     {% endcall %}
     {% call detail.card("Roles") %}

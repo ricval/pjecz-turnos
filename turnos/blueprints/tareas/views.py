@@ -4,14 +4,14 @@ Tareas, vistas
 from flask import Blueprint, render_template
 from flask_login import login_required
 
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
-
 from turnos.blueprints.tareas.models import Tarea
 
-tareas = Blueprint("tareas", __name__, template_folder="templates")
-
 MODULO = "TAREAS"
+
+tareas = Blueprint("tareas", __name__, template_folder="templates")
 
 
 @tareas.before_request

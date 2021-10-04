@@ -18,7 +18,8 @@ class Modulo(db.Model, UniversalMixin):
     nombre = db.Column(db.String(256), unique=True, nullable=False)
 
     # Hijos
-    permisos = db.relationship('Permiso', back_populates='modulo')
+    bitacoras = db.relationship("Bitacora", back_populates="modulo")
+    permisos = db.relationship("Permiso", back_populates="modulo")
 
     def __repr__(self):
         """Representación"""

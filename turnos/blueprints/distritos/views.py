@@ -4,13 +4,14 @@ Distritos, vistas
 from flask import Blueprint, render_template
 from flask_login import login_required
 
+from turnos.blueprints.distritos.models import Distrito
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
-from turnos.blueprints.distritos.models import Distrito
-
-distritos = Blueprint("distritos", __name__, template_folder="templates")
 
 MODULO = "DISTRITOS"
+
+distritos = Blueprint("distritos", __name__, template_folder="templates")
 
 
 @distritos.before_request
