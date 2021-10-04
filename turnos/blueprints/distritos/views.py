@@ -1,11 +1,11 @@
 """
 Distritos, vistas
 """
-from flask import Blueprint, render_template
+from flask import Blueprint, flash, render_template, redirect, url_for
 from flask_login import login_required
 
 from turnos.blueprints.distritos.models import Distrito
-from turnos.blueprints.modulos.models import Modulo
+from turnos.blueprints.distritos.forms import DistritoForm
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
 
@@ -49,3 +49,16 @@ def detail(distrito_id):
     """Detalle de un Distrito"""
     distrito = Distrito.query.get_or_404(distrito_id)
     return render_template("distrito/detail.jinja2", distrito=distrito)
+
+
+@distritos.route("/distritos/nuevo", methods=["GET", "POST"])
+@permission_required(MODULO, Permiso.CREAR)
+def new():
+    """Nuevo Distrito"""
+    form = DistritoForm()
+    if form.validate_on_submit():
+        distrito = Distrito(nombre=form.nombre.data)
+        distrito.save()
+        flash(f"Distrito {distrito.nombre} guardado.", "success")
+        return redirect(url_for("distritos.detail", distrito_id=distrito.id))
+    return render_template("distritos/new.jinja2", form=form)
