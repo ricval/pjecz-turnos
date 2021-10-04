@@ -36,7 +36,7 @@
             "{% block title %}${1:Titulo}{% endblock %}",
             "",
             "{% block topbar_actions %}",
-            "\t{% call topbar.page_buttons(${2:instancia}.${3:nombre_o_descripcion}) %}",
+            "\t{% call topbar.page_buttons('${1:Titulo} ' + ${2:instancia}.${3:nombre_o_descripcion}) %}",
             "\t\t{{ topbar.button_previous('${4:Titulos_Plural}', url_for('${5:blueprint}.list_active')) }}",
             "\t\t{% if current_user.can_edit('${5:blueprint}') %}",
             "\t\t\t{{ topbar.button_edit('Editar', url_for('${5:blueprint}.edit', ${2:instancia}_id=${2:instancia}.id)) }}",

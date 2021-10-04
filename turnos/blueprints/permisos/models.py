@@ -12,6 +12,13 @@ class Permiso(db.Model, UniversalMixin):
     MODIFICAR = 2
     CREAR = 3
     ADMINISTRAR = 4
+    NIVELES = {
+        0: "NULO",
+        1: "VER",
+        2: "VER y MODIFICAR",
+        3: "VER, MODIFICAR y CREAR",
+        4: "ADMINISTRAR",
+    }
 
     # Nombre de la tabla
     __tablename__ = "permisos"

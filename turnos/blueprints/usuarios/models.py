@@ -5,6 +5,7 @@ from flask import current_app
 from flask_login import UserMixin
 
 from lib.universal_mixin import UniversalMixin
+
 from turnos.extensions import db, pwd_context
 from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
@@ -25,13 +26,13 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
     autoridad = db.relationship("Autoridad", back_populates="usuarios")
 
     # Columnas
-    email = db.Column(db.String(256), unique=True, index=True)
-    contrasena = db.Column(db.String(256), nullable=False)
     nombres = db.Column(db.String(256), nullable=False)
     apellido_paterno = db.Column(db.String(256), nullable=False)
     apellido_materno = db.Column(db.String(256))
-    curp = db.Column(db.String(256), unique=True)
+    curp = db.Column(db.String(256))
+    email = db.Column(db.String(256), nullable=False, unique=True, index=True)
     puesto = db.Column(db.String(256))
+    contrasena = db.Column(db.String(256), nullable=False)
 
     # Hijos
     bitacoras = db.relationship("Bitacora", back_populates="usuario", lazy="noload")
@@ -62,14 +63,18 @@ class Usuario(db.Model, UserMixin, UniversalMixin):
 
     def can(self, module, permission):
         """¿Tiene permiso?"""
-        modulo = Modulo.query.filter_by(nombre=module).first()
-        if modulo is None:
+        if isinstance(module, str):
+            modulo = Modulo.query.filter_by(nombre=module.upper()).filter_by(estatus="A").first()
+            if modulo is None:
+                return False
+        elif isinstance(module, Modulo) is False:
             return False
         maximo = 0
         for usuario_rol in self.usuarios_roles:
-            for permiso in usuario_rol.rol.permisos:
-                if permiso.modulo == modulo and permiso.nivel > maximo:
-                    maximo = permiso.nivel
+            if usuario_rol.estatus == "A":
+                for permiso in usuario_rol.rol.permisos:
+                    if permiso.estatus == "A" and permiso.modulo == modulo and permiso.nivel > maximo:
+                        maximo = permiso.nivel
         return maximo >= permission
 
     def can_view(self, module):

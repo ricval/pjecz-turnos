@@ -1,0 +1,54 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/list.jinja2' as list %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Modulos{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons(titulo) %}
+        {% if current_user.can_view('permisos') %}
+            {{ topbar.button('Permisos', url_for('permisos.list_active'), 'mdi:lock') }}
+        {% endif %}
+        {% if current_user.can_view('roles') %}
+            {{ topbar.button('Roles', url_for('roles.list_active'), 'mdi:gamepad') }}
+        {% endif %}
+        {% if current_user.can_view('usuarios') %}
+            {{ topbar.button('Usuarios', url_for('usuarios.list_active'), 'mdi:account-key') }}
+        {% endif %}
+        {% if current_user.can_view('usuarios roles') %}
+            {{ topbar.button('Usuarios-Roles', url_for('usuarios_roles.list_active'), 'mdi:account-group') }}
+        {% endif %}
+        {% if current_user.can_edit('modulos') %}
+            {% if estatus == 'A' %}{{ topbar.button_list_inactive('Inactivos', url_for('modulos.list_inactive')) }}{% endif %}
+            {% if estatus == 'B' %}{{ topbar.button_list_active('Activos', url_for('modulos.list_active')) }}{% endif %}
+        {% endif %}
+        {% if current_user.can_insert('modulos') %}
+            {{ topbar.button_new('Nuevo Modulo', url_for('modulos.new')) }}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {% call list.card() %}
+        <table id="modulos_datatable" class="table {% if estatus == 'B'%}table-dark{% endif %} display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombre o descripción</th>
+                    <th>Columna</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for modulo in modulos %}
+                <tr>
+                    <td><a href="{{ url_for('modulos.detail', modulo_id=modulo.id) }}">{{ modulo.nombre }}</a></td>
+                    <td>{{ modulo.columna }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endcall %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {{ list.datatable('modulos_datatable') }}
+{% endblock %}

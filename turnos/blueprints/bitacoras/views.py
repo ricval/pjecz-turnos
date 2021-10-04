@@ -6,13 +6,14 @@ from flask_login import login_required
 
 from lib import datatables
 
+from turnos.blueprints.bitacoras.models import Bitacora
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
-from turnos.blueprints.bitacoras.models import Bitacora
-
-bitacoras = Blueprint("bitacoras", __name__, template_folder="templates")
 
 MODULO = "BITACORAS"
+
+bitacoras = Blueprint("bitacoras", __name__, template_folder="templates")
 
 
 @bitacoras.route("/bitacoras")

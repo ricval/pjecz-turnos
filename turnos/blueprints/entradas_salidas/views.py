@@ -7,13 +7,14 @@ from flask_login import login_required
 
 from lib import datatables
 
+from turnos.blueprints.modulos.models import Modulo
+from turnos.blueprints.entradas_salidas.models import EntradaSalida
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
-from turnos.blueprints.entradas_salidas.models import EntradaSalida
+
+MODULO = "ENTRADAS SALIDAS"
 
 entradas_salidas = Blueprint("entradas_salidas", __name__, template_folder="templates")
-
-MODULO = "ENTRADAS_SALIDAS"
 
 
 @entradas_salidas.route("/entradas_salidas")

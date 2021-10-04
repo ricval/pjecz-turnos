@@ -5,6 +5,8 @@ from pathlib import Path
 import csv
 import click
 
+from lib.safe_string import safe_string
+
 from turnos.blueprints.roles.models import Rol
 from turnos.blueprints.usuarios.models import Usuario
 from turnos.blueprints.usuarios_roles.models import UsuarioRol
@@ -41,12 +43,12 @@ def alimentar_usuarios_roles():
                 if rol is None:
                     click.echo(f"  Falta el rol {rol_str}")
                     continue
+                descripcion = f"{usuario.email} en {rol.nombre}"
                 UsuarioRol(
                     usuario=usuario,
                     rol=rol,
-                    descripcion=f"{usuario.email} es {rol.nombre}",
+                    descripcion=descripcion,
                 ).save()
+                click.echo(f"  {descripcion}")
                 contador += 1
-                if contador % 100 == 0:
-                    click.echo(f"  Van {contador} usuarios-roles...")
     click.echo(f"  {contador} usuarios-roles alimentados.")

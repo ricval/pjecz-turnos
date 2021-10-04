@@ -4,13 +4,14 @@ Autoridades, vistas
 from flask import Blueprint, render_template
 from flask_login import login_required
 
+from turnos.blueprints.autoridades.models import Autoridad
+from turnos.blueprints.modulos.models import Modulo
 from turnos.blueprints.permisos.models import Permiso
 from turnos.blueprints.usuarios.decorators import permission_required
-from turnos.blueprints.autoridades.models import Autoridad
-
-autoridades = Blueprint("autoridades", __name__, template_folder="templates")
 
 MODULO = "AUTORIDADES"
+
+autoridades = Blueprint("autoridades", __name__, template_folder="templates")
 
 
 @autoridades.before_request
@@ -23,16 +24,24 @@ def before_request():
 @autoridades.route("/autoridades")
 def list_active():
     """Listado de Autoridades activos"""
-    autoridades_activos = Autoridad.query.filter(Autoridad.estatus == "A").order_by(Autoridad.nombre).limit(100).all()
-    return render_template("autoridades/list.jinja2", autoridades=autoridades_activos, estatus="A")
+    return render_template(
+        "autoridades/list.jinja2",
+        autoridades=Autoridad.query.filter(Autoridad.estatus == "A").all(),
+        titulo="Autoridades",
+        estatus="A",
+    )
 
 
 @autoridades.route("/autoridades/inactivos")
 @permission_required(MODULO, Permiso.MODIFICAR)
 def list_inactive():
     """Listado de Autoridades inactivos"""
-    autoridades_inactivos = Autoridad.query.filter(Autoridad.estatus == "B").order_by(Autoridad.nombre).limit(100).all()
-    return render_template("autoridades/list.jinja2", autoridades=autoridades_inactivos, estatus="B")
+    return render_template(
+        "autoridades/list.jinja2",
+        autoridades=Autoridad.query.filter(Autoridad.estatus == "B").all(),
+        titulo="Autoridades inactivas",
+        estatus="B",
+    )
 
 
 @autoridades.route("/autoridades/<int:autoridad_id>")

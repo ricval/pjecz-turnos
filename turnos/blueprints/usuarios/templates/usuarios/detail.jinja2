@@ -6,7 +6,7 @@
 {% block title %}Usuario{% endblock %}
 
 {% block topbar_actions %}
-    {% call topbar.page_buttons('Usuario') %}
+    {% call topbar.page_buttons('Usuario ' + usuario.email) %}
         {{ topbar.button_previous('Usuarios', url_for('usuarios.list_active')) }}
         {% if current_user.can_edit('usuarios') %}
             {{ topbar.button_edit('Editar', url_for('usuarios.edit', usuario_id=usuario.id)) }}
@@ -19,8 +19,26 @@
 {% block content %}
     {% call detail.card(estatus=usuario.estatus) %}
         {{ detail.label_value_big('Nombre', usuario.nombre) }}
+        {{ detail.label_value('CURP', usuario.curp) }}
         {{ detail.label_value('e-mail', usuario.email) }}
+        {{ detail.label_value('Puesto', usuario.puesto) }}
         {{ detail.label_value('Creado', moment(usuario.creado).format('llll')) }}
+    {% endcall %}
+    {% call detail.card("Roles") %}
+        <table id="roles_datatable" class="table display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Rol</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario_rol in usuario.usuarios_roles %}
+                <tr>
+                    <td><a href="{{ url_for('roles.detail', rol_id=usuario_rol.rol_id) }}">{{ usuario_rol.rol.nombre }}</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endcall %}
 {% endblock %}
 
@@ -30,4 +48,5 @@
         {% if usuario.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + usuario.nombre + '?') }}{% endif %}
     {% endif %}
     {{ detail.moment_js(moment) }}
+    {{ detail.datatable('roles_datatable') }}
 {% endblock %}

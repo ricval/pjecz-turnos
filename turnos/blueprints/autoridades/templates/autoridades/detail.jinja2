@@ -1,0 +1,63 @@
+{% extends 'layouts/app.jinja2' %}
+{% import 'macros/detail.jinja2' as detail %}
+{% import 'macros/modals.jinja2' as modals %}
+{% import 'macros/topbar.jinja2' as topbar %}
+
+{% block title %}Autoridad{% endblock %}
+
+{% block topbar_actions %}
+    {% call topbar.page_buttons('Autoridad ' + autoridad.descripcion_corta + ', ' + autoridad.distrito.nombre_corto) %}
+        {{ topbar.button_previous('Autoridades', url_for('autoridades.list_active')) }}
+        {% if current_user.can_edit('autoridades') %}
+            {{ topbar.button_edit('Editar', url_for('autoridades.edit', autoridad_id=autoridad.id)) }}
+            {% if autoridad.estatus == 'A' %}{{ topbar.button_delete('Eliminar', url_for('autoridades.delete', autoridad_id=autoridad.id)) }}{% endif %}
+            {% if autoridad.estatus == 'B' %}{{ topbar.button_recover('Recuperar', url_for('autoridades.recover', autoridad_id=autoridad.id)) }}{% endif %}
+        {% endif %}
+    {% endcall %}
+{% endblock %}
+
+{% block content %}
+    {# Detalle #}
+    {% call detail.card(estatus=autoridad.estatus) %}
+        {{ detail.label_value_big('Descripción', autoridad.descripcion) }}
+        {{ detail.label_value('Descripción corta', autoridad.descripcion_corta) }}
+        {{ detail.label_value('Distrito', autoridad.distrito.nombre, url_for('distritos.detail', distrito_id=autoridad.distrito_id)) }}
+        {{ detail.label_value('Clave', autoridad.clave) }}
+        {{ detail.label_value_boolean('Es Jurisdiccional', autoridad.es_jurisdiccional) }}
+        {{ detail.label_value('Creado', moment(autoridad.creado).format('llll')) }}
+    {% endcall %}
+    {# Usuarios de la autoridad #}
+    {% if usuarios %}
+        {% call detail.card('Usuarios') %}
+            <table id="usuarios_datatable" class="table display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>e-mail</th>
+                        <th>Nombres</th>
+                        <th>Puestos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr>
+                        <td><a href="{{ url_for('usuarios.detail', usuario_id=usuario.id) }}">{{ usuario.email }}</a></td>
+                        <td>{{ usuario.nombre }}</td>
+                        <td>{{ usuario.puesto }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endcall %}
+    {% endif %}
+{% endblock %}
+
+{% block custom_javascript %}
+    {% if current_user.can_edit('autoridades') %}
+        {% if autoridad.estatus == 'A' %}{{ modals.custom_javascript_delete('Eliminar', '¿Eliminar a ' + autoridad.descripcion + '?') }}{% endif %}
+        {% if autoridad.estatus == 'B' %}{{ modals.custom_javascript_recover('Recuperar', '¿Recuperar a ' + autoridad.descripcion + '?') }}{% endif %}
+    {% endif %}
+    {% if usuarios %}
+        {{ detail.datatable('usuarios_datatable') }}
+    {% endif %}
+    {{ detail.moment_js(moment) }}
+{% endblock %}

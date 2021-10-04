@@ -15,12 +15,14 @@
 			"from ${2:sistema}.blueprints.usuarios.decorators import permission_required",
 			"from ${2:sistema}.blueprints.${3:blueprint}.models import ${4:Clase}",
 			"",
+			"MODULO = '${4:MODULO}'",
+			"",
 			"${3:blueprint} = Blueprint('${3:blueprint}', __name__, template_folder='templates')",
 			"",
 			"",
 			"@${3:blueprint}.before_request",
 			"@login_required",
-			"@permission_required(Permiso.VER_)",
+			"@permission_required(MODULO, Permiso.VER)",
 			"def before_request():",
 			"\t\"\"\" Permiso por defecto \"\"\"",
 			"",
@@ -64,7 +66,7 @@
 		"prefix": "fviews_list_inactive",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/inactivos')",
-			"@permission_required(Permiso.MODIFICAR_)",
+			"@permission_required(MODULO, Permiso.MODIFICAR)",
 			"def list_inactive():",
 			"\t\"\"\" Listado de ${2:Modulo} inactivos \"\"\"",
 			"\t${3:registros}_inactivos = ${4:Clase}.query.filter(${4:Clase}.estatus == 'B').order_by(${4:Clase}.creado.desc()).limit(100).all()",
@@ -79,7 +81,7 @@
 		"prefix": "fviews_list_inactive_datatable_json",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/inactivos')",
-			"@permission_required(Permiso.MODIFICAR_)",
+			"@permission_required(MODULO, Permiso.MODIFICAR)",
 			"def list_inactive():",
 			"\t\"\"\"Listado de ${2:Modulo} inactivos\"\"\"",
 			"\treturn render_template(",
@@ -172,7 +174,7 @@
 		"prefix": "fviews_new",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/nuevo', methods=['GET', 'POST'])",
-			"@permission_required(Permiso.CREAR_)",
+			"@permission_required(MODULO, Permiso.CREAR)",
 			"def new():",
 			"\t\"\"\" Nuevo ${2:Modulo} \"\"\"",
 			"\tform = ${3:ClassForm}()",
@@ -192,7 +194,7 @@
 		"prefix": "fviews_edit",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/edicion/<int:${2:column_id}>', methods=['GET', 'POST'])",
-			"@permission_required(Permiso.MODIFICAR_)",
+			"@permission_required(MODULO, Permiso.MODIFICAR)",
 			"def edit(${2:column_id}):",
 			"\t\"\"\" Editar ${3:Modulo} \"\"\"",
 			"\t${4:instance} = ${5:Class}.query.get_or_404(${2:column_id})",
@@ -214,7 +216,7 @@
 		"prefix": "fviews_delete",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/eliminar/<int:${2:column_id}>')",
-			"@permission_required(Permiso.MODIFICAR_)",
+			"@permission_required(MODULO, Permiso.MODIFICAR)",
 			"def delete(${2:column_id}):",
 			"\t\"\"\" Eliminar ${3:Modulo} \"\"\"",
 			"\t${4:instance} = ${5:Class}.query.get_or_404(${2:column_id})",
@@ -232,7 +234,7 @@
 		"prefix": "fviews_recover",
 		"body": [
 			"@${1:blueprint}.route('/${1:blueprint}/recuperar/<int:${2:column_id}>')",
-			"@permission_required(Permiso.MODIFICAR_)",
+			"@permission_required(MODULO, Permiso.MODIFICAR)",
 			"def recover(${2:column_id}):",
 			"\t\"\"\" Recuperar ${3:Modulo} \"\"\"",
 			"\t${4:instance} = ${5:Class}.query.get_or_404(${2:column_id})",
@@ -250,7 +252,7 @@
 		"prefix": "fviews_bitacora_save",
 		"body": [
 			"bitacora = Bitacora(",
-			"\tmodulo=MODULO,",
+			"\tmodulo=Modulo.query.filter_by(nombre=MODULO).first(),",
 			"\tusuario=current_user,",
 			"\tdescripcion=safe_message('${1:Nuevo/Editado/Eliminado/Recuperado} registro con...'),",
 			"\turl=url_for('${2:blueprint}.detail', ${3:column_id}=${4:instance}.id),",
